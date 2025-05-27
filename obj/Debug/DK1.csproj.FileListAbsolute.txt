@@ -107,6 +107,7 @@ C:\Users\user\source\repos\DK1\bin\System.Web.Razor.xml
 C:\Users\user\source\repos\DK1\bin\System.Web.WebPages.xml
 C:\Users\user\source\repos\DK1\bin\System.Web.WebPages.Deployment.xml
 C:\Users\user\source\repos\DK1\bin\System.Web.WebPages.Razor.xml
+C:\Users\user\source\repos\DK1\obj\Debug\DK1.csproj.AssemblyReference.cache
 C:\Users\user\source\repos\DK1\obj\Debug\DK1.Migrations.InitialCreate.resources
 C:\Users\user\source\repos\DK1\obj\Debug\DK1.Migrations.transport.resources
 C:\Users\user\source\repos\DK1\obj\Debug\DK1.Migrations.AddDailyExpenseFields.resources

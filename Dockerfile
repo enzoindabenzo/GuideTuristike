@@ -1,25 +1,23 @@
-﻿# Stage 1: Build
+﻿# Use the .NET 6 SDK image for build
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 
 WORKDIR /app
 
-# Copy solution file and project files
-COPY *.sln .
-COPY GuideTuristike/*.csproj ./GuideTuristike/
+# Copy solution and project files
+COPY DK1.sln ./
+COPY *.csproj ./
 
 # Restore dependencies
 RUN dotnet restore
 
 # Copy everything else and build
-COPY . .
-
+COPY . ./
 RUN dotnet publish -c Release -o out
 
-# Stage 2: Runtime
+# Use the runtime image for the final container
 FROM mcr.microsoft.com/dotnet/aspnet:6.0 AS runtime
-
 WORKDIR /app
 
 COPY --from=build /app/out ./
 
-ENTRYPOINT ["dotnet", "GuideTuristike.dll"]
+ENTRYPOINT ["dotnet", "DK1.dll"]
