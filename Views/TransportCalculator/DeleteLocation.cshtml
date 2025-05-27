@@ -1,0 +1,96 @@
+﻿@model DK1.Models.Cal.Location
+@{
+    ViewBag.Title = "Delete Location";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-6 mx-auto">
+            <div class="card">
+                <div class="card-header bg-danger text-white">
+                    <h5 class="mb-0">Konfirmo Fshirjen</h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <i class="fas fa-exclamation-triangle"></i> A jeni të sigurt që doni të fshini këtë lokacion?
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4 fw-bold">Emri:</div>
+                        <div class="col-md-8">@Model.Name</div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4 fw-bold">Rajoni:</div>
+                        <div class="col-md-8">@Model.Region</div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4 fw-bold">Koordinatat:</div>
+                        <div class="col-md-8">@Model.Latitude.ToString("F4"), @Model.Longitude.ToString("F4")</div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-4 fw-bold">Destinacion i Popullarizuar:</div>
+                        <div class="col-md-8">
+                            @(Model.IsPopularDestination
+                                ? Html.Raw("<span class='badge bg-success'>Po</span>")
+                                : Html.Raw("<span class='badge bg-secondary'>Jo</span>"))
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div id="deleteMap" style="height: 300px; width: 100%;"></div>
+                    </div>
+
+                    @using (Html.BeginForm("DeleteLocationConfirmed", "TransportCalculator", new { id = Model.Id }, FormMethod.Post))
+                    {
+                        @Html.AntiForgeryToken()
+                        <div class="mt-4">
+                            <button type="submit" class="btn btn-danger">Konfirmo Fshirjen</button>
+                            <a href="@Url.Action("ManageLocations", "TransportCalculator")" class="btn btn-secondary ms-2">Kthehu</a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+}
+
+@section Scripts {
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Get the current coordinates
+            var currentLat = @Model.Latitude;
+            var currentLng = @Model.Longitude;
+
+            // Initialize the map centered on the location (read-only)
+            var map = L.map('deleteMap', {
+                dragging: false,
+                scrollWheelZoom: false,
+                touchZoom: false,
+                doubleClickZoom: false,
+                boxZoom: false,
+                tap: false,
+                keyboard: false,
+                zoomControl: false
+            }).setView([currentLat, currentLng], 13);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            // Add a marker at the location
+            var marker = L.marker([currentLat, currentLng]).addTo(map);
+            marker.bindPopup("<b>@Model.Name</b><br>@Model.Region").openPopup();
+        });
+    </script>
+}

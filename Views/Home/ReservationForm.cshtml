@@ -1,0 +1,330 @@
+﻿@using DK1.Models
+@model ReservationViewModel
+@{
+    ViewBag.Title = ViewBag.Language == "en" ? "Make a Reservation" : "Bëj Rezervim";
+    var lang = ViewBag.Language as string ?? "sq"; // default Shqip
+}
+
+@section Styles {
+    <style>
+        /* Scoped styles for the reservation form */
+        .reservation-form-container {
+            background-color: var(--body-bg);
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+
+            .reservation-form-container .text-primary {
+                color: var(--primary) !important;
+            }
+
+            .reservation-form-container .btn-primary {
+                background-color: var(--primary);
+                border-color: var(--primary-dark);
+            }
+
+                .reservation-form-container .btn-primary:hover {
+                    background-color: var(--primary-dark);
+                    border-color: var(--primary-dark);
+                }
+
+            .reservation-form-container .form-control {
+                background-color: var(--card-bg);
+                color: var(--text-color);
+                border-color: var(--border-color);
+            }
+
+            .reservation-form-container .card {
+                border: none;
+                border-radius: 1rem;
+                background-color: var(--card-bg);
+            }
+
+            .reservation-form-container .alert-danger {
+                background-color: rgba(220, 53, 69, 0.1);
+                border-color: rgba(220, 53, 69, 0.3);
+                color: var(--text-color);
+            }
+
+        .pricing-table {
+            display: none;
+            margin-top: 1rem;
+        }
+
+            .pricing-table.show {
+                display: block;
+            }
+
+        .pricing-breakdown {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            padding: 1rem;
+        }
+
+        .total-price {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .discount-info {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        /* Loading state for submission */
+        .loading-overlay {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+
+        @@keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .card-body {
+            position: relative;
+        }
+    </style>
+}
+
+<div class="reservation-form-container container py-4 py-lg-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-body">
+                    <h2 class="card-title text-primary mb-4">
+                        @(lang == "en" ? "Reservation for" : "Rezervim për") @Model.DestinationName
+                    </h2>
+                    @using (Html.BeginForm("ReservationForm", "Home", FormMethod.Post, new { @class = "needs-validation", novalidate = true, id = "reservationForm" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.HiddenFor(model => model.DestinationId)
+                        @Html.HiddenFor(model => model.DestinationName)
+                        @Html.Hidden("totalCost", "0", new { id = "hiddenTotalCost" }) <!-- Hidden field to store total cost -->
+
+                        <div class="mb-3">
+                            @Html.LabelFor(model => model.UserName, lang == "en" ? "Full Name" : "Emri i Plotë", new { @class = "form-label" })
+                            @Html.TextBoxFor(model => model.UserName, new { @class = "form-control", required = "required", aria_required = "true" })
+                            @Html.ValidationMessageFor(model => model.UserName, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="mb-3">
+                            @Html.LabelFor(model => model.Email, lang == "en" ? "Email Address" : "Adresa e Email-it", new { @class = "form-label" })
+                            @Html.TextBoxFor(model => model.Email, new { @class = "form-control", type = "email", required = "required", aria_required = "true" })
+                            @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="mb-3">
+                            @Html.LabelFor(model => model.Phone, lang == "en" ? "Phone Number" : "Numri i Telefonit", new { @class = "form-label" })
+                            @Html.TextBoxFor(model => model.Phone, new { @class = "form-control", type = "tel", aria_required = "false" })
+                            @Html.ValidationMessageFor(model => model.Phone, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="mb-3">
+                            @Html.LabelFor(model => model.ReservationDate, lang == "en" ? "Reservation Date" : "Data e Rezervimit", new { @class = "form-label" })
+                            @Html.TextBoxFor(model => model.ReservationDate, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date", required = "required", aria_required = "true" })
+                            @Html.ValidationMessageFor(model => model.ReservationDate, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="mb-3">
+                            @Html.LabelFor(model => model.NumberOfPeople, lang == "en" ? "Number of People" : "Numri i Personave", new { @class = "form-label" })
+                            @Html.TextBoxFor(model => model.NumberOfPeople, new { @class = "form-control", type = "number", min = "1", max = "100", required = "required", id = "NumberOfPeople", aria_required = "true" })
+                            @Html.ValidationMessageFor(model => model.NumberOfPeople, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="mb-3">
+                            @Html.LabelFor(model => model.NumberOfDays, lang == "en" ? "Number of Days" : "Numri i Ditëve", new { @class = "form-label" })
+                            @Html.TextBoxFor(model => model.NumberOfDays, new { @class = "form-control", type = "number", min = "1", max = "30", id = "NumberOfDays", aria_required = "true" })
+                            @Html.ValidationMessageFor(model => model.NumberOfDays, "", new { @class = "text-danger" })
+                        </div>
+
+                        <!-- Pricing Table -->
+                        <div id="pricingTable" class="pricing-table">
+                            <div class="pricing-breakdown">
+                                <h5 class="mb-3">@(lang == "en" ? "Price Breakdown" : "Ndarja e Çmimit")</h5>
+
+                                <div class="table-responsive">
+                                    <table class="table table-sm">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">@(lang == "en" ? "Person" : "Personi")</th>
+                                                <th scope="col">@(lang == "en" ? "Base Price/Day" : "Çmimi Bazë/Ditë")</th>
+                                                <th scope="col">@(lang == "en" ? "Discount" : "Zbritje")</th>
+                                                <th scope="col">@(lang == "en" ? "Price/Day" : "Çmimi/Ditë")</th>
+                                                <th scope="col">@(lang == "en" ? "Total" : "Totali")</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="pricingTableBody">
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <hr>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="total-price">@(lang == "en" ? "Total Cost:" : "Kosto Totale:")</span>
+                                    <span id="totalCost" class="total-price">0 ALL</span>
+                                </div>
+                                <div class="discount-info mt-2">
+                                    @(lang == "en" ? "* Discount: 2% per additional person, up to 20%" : "* Zbritje: 2% për çdo person shtesë, deri në 20%")
+                                </div>
+                            </div>
+                        </div>
+
+                        if (Model.EstimatedPrice.HasValue)
+                        {
+                            <div class="alert alert-info">
+                                @(lang == "en" ? "Estimated Total Price:" : "Çmimi Total i Vlerësuar:") <strong>@Model.EstimatedPrice.Value.ToString("C")</strong>
+                            </div>
+                        }
+
+                        <!-- Payment Method Selection -->
+                        <div class="mb-3">
+                            @Html.LabelFor(model => model.PaymentMethod, lang == "en" ? "Payment Method" : "Metoda e Pagesës", new { @class = "form-label" })
+                            @Html.DropDownListFor(model => model.PaymentMethod, new SelectList(new[]
+                            {
+                                new { Value = "", Text = lang == "en" ? "Select Payment Method" : "Zgjidh Metodën e Pagesës" },
+                                new { Value = "Physical", Text = lang == "en" ? "Physical (Pay on Arrival)" : "Fizike (Paguaj në Arritje)" },
+                                new { Value = "PayPal", Text = "PayPal" }
+                            }, "Value", "Text"), new { @class = "form-control", required = "required", aria_required = "true", id = "PaymentMethod" })
+                            @Html.ValidationMessageFor(model => model.PaymentMethod, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="mb-3">
+                            @Html.LabelFor(model => model.Notes, lang == "en" ? "Additional Notes" : "Shënime Shtesë", new { @class = "form-label" })
+                            @Html.TextAreaFor(model => model.Notes, new { @class = "form-control", rows = "4" })
+                            @Html.ValidationMessageFor(model => model.Notes, "", new { @class = "text-danger" })
+                        </div>
+
+                        <div class="d-grid gap-2 position-relative">
+                            <button type="submit" class="btn btn-primary" id="submitButton">
+                                <i class="bi bi-calendar-check me-2"></i>
+                                @(lang == "en" ? "Submit Reservation" : "Dërgo Rezervimin")
+                            </button>
+                            <a href="@Url.Action("GuidaTuristike", "Home", new { language = lang })" class="btn btn-outline-primary">
+                                <i class="bi bi-arrow-left me-2"></i>
+                                @(lang == "en" ? "Back to Destinations" : "Kthehu te Destinacionet")
+                            </a>
+                            <div class="loading-overlay" id="loadingOverlay">
+                                <div class="loading-spinner"></div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            'use strict';
+
+            const forms = document.querySelectorAll('.needs-validation');
+            const submitButton = document.getElementById('submitButton');
+            const loadingOverlay = document.getElementById('loadingOverlay');
+
+            Array.from(forms).forEach(form => {
+                form.addEventListener('submit', event => {
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    } else {
+                        // Show loading spinner when form is valid and being submitted
+                        submitButton.disabled = true;
+                        loadingOverlay.style.display = 'flex';
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+
+            // Pricing logic
+            const peopleInput = document.getElementById("NumberOfPeople");
+            const daysInput = document.getElementById("NumberOfDays");
+            const pricingTable = document.getElementById("pricingTable");
+            const pricingTableBody = document.getElementById("pricingTableBody");
+            const totalCostElement = document.getElementById("totalCost");
+            const hiddenTotalCost = document.getElementById("hiddenTotalCost");
+            const medianPrice = @(Model.MedianDailyExpenseAL?.ToString("F2") ?? "0");
+
+            function calculatePrice() {
+                const people = parseInt(peopleInput.value) || 0;
+                const days = parseInt(daysInput.value) || 1;
+                const base = parseFloat(medianPrice);
+
+                if (people <= 0 || isNaN(base)) {
+                    pricingTable.classList.remove('show');
+                    return;
+                }
+
+                pricingTable.classList.add('show');
+                pricingTableBody.innerHTML = '';
+
+                // Calculate discount: 2% per additional person, capped at 20%
+                const additionalPeople = people > 1 ? people - 1 : 0; // Additional people after the first
+                const discountPercent = Math.min(additionalPeople * 2, 20); // 2% per additional person, capped at 20%
+                const discount = discountPercent / 100; // Convert to decimal
+
+                // Calculate total base cost and apply discount
+                const totalBaseCost = base * people * days;
+                const discountedTotal = totalBaseCost * (1 - discount);
+                const pricePerDay = base * (1 - discount); // Discounted price per day
+
+                // Populate the table
+                for (let i = 0; i < people; i++) {
+                    const totalForPerson = pricePerDay * days;
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                        <td>${i + 1}</td>
+                        <td>${base.toFixed(2)} ALL</td>
+                        <td>${discountPercent}%</td>
+                        <td>${pricePerDay.toFixed(2)} ALL</td>
+                        <td>${totalForPerson.toFixed(2)} ALL</td>
+                    `;
+                    pricingTableBody.appendChild(row);
+                }
+
+                // Update total cost
+                const formattedTotal = discountedTotal.toLocaleString(undefined, {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }) + " ALL";
+                totalCostElement.textContent = formattedTotal;
+                // Update hidden field with total cost in ALL (without formatting)
+                hiddenTotalCost.value = discountedTotal.toFixed(2);
+            }
+
+            peopleInput.addEventListener("input", calculatePrice);
+            daysInput.addEventListener("input", calculatePrice);
+
+            // Calculate on page load if values exist
+            calculatePrice();
+        })();
+    </script>
+}

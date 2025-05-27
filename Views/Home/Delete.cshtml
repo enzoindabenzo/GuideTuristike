@@ -1,0 +1,118 @@
+﻿@using DK1.Models
+@model Reservation
+@{
+    var lang = ViewBag.Language as string ?? "sq"; // default Shqip
+}
+
+@section Styles {
+    <style>
+        .delete-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 2rem;
+            background-color: #fff;
+            border-radius: 0.75rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+            .delete-container h2 {
+                color: #dc3545;
+                font-weight: 600;
+                margin-bottom: 1.5rem;
+            }
+
+        .delete-details {
+            background-color: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 0.5rem;
+            margin-bottom: 2rem;
+        }
+
+            .delete-details p {
+                margin: 0.5rem 0;
+                font-size: 1rem;
+                color: #444;
+            }
+
+                .delete-details p strong {
+                    color: #333;
+                }
+
+        .delete-buttons .btn {
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            border-radius: 0.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .delete-buttons .btn-danger {
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+
+            .delete-buttons .btn-danger:hover {
+                background-color: #c82333;
+                border-color: #bd2130;
+            }
+
+        .delete-buttons .btn-secondary {
+            background-color: #6c757d;
+            border-color: #6c757d;
+        }
+
+            .delete-buttons .btn-secondary:hover {
+                background-color: #5a6268;
+                border-color: #545b62;
+            }
+    </style>
+}
+
+<div class="container py-4 py-lg-5">
+    <div class="delete-container">
+        <h2>@(lang == "en" ? "Delete Reservation" : "Fshi Rezervimin")</h2>
+
+        <div class="delete-details">
+            <p><strong>@(lang == "en" ? "Reservation ID" : "ID e Rezervimit"):</strong> #@Model.Id</p>
+            <p><strong>@(lang == "en" ? "Destination" : "Destinacioni"):</strong> @(Model.Destination?.Name ?? "N/A")</p>
+            <p><strong>@(lang == "en" ? "Customer" : "Klienti"):</strong> @Model.UserName</p>
+            <p><strong>@(lang == "en" ? "Email" : "Email"):</strong> @Model.Email</p>
+            @if (!string.IsNullOrEmpty(Model.Phone))
+            {
+                <p><strong>@(lang == "en" ? "Phone" : "Telefon"):</strong> @Model.Phone</p>
+            }
+            <p><strong>@(lang == "en" ? "Reservation Date" : "Data e Rezervimit"):</strong> @Model.ReservationDate.ToString("MMM dd, yyyy")</p>
+            <p><strong>@(lang == "en" ? "Number of People" : "Numri i Personave"):</strong> @Model.NumberOfPeople @(lang == "en" ? "people" : "persona")</p>
+            @if (Model.NumberOfDays > 0)
+            {
+                <p><strong>@(lang == "en" ? "Number of Days" : "Numri i Ditëve"):</strong> @Model.NumberOfDays @(lang == "en" ? "days" : "ditë")</p>
+            }
+            @if (!string.IsNullOrEmpty(Model.Notes))
+            {
+                <p><strong>@(lang == "en" ? "Notes" : "Shënime"):</strong> @Model.Notes</p>
+            }
+            <p><strong>@(lang == "en" ? "Status" : "Statusi"):</strong> @(lang == "en" ? Model.Status : (Model.Status == "Pending" ? "Në Pritje" : Model.Status == "Approved" ? "Aprovuar" : Model.Status == "Rejected" ? "Refuzuar" : Model.Status))</p>
+        </div>
+
+        <p class="text-danger mb-4">
+            @(lang == "en" ? "Are you sure you want to delete this reservation? This action cannot be undone." : "Jeni i sigurt që doni ta fshini këtë rezervim? Ky veprim nuk mund të zhbëhet.")
+        </p>
+
+        @using (Html.BeginForm("DeleteReservation", "Home", FormMethod.Post, new { @class = "d-inline" }))
+        {
+            @Html.AntiForgeryToken()
+            @Html.Hidden("id", Model.Id)
+            @Html.Hidden("language", lang)
+            <div class="delete-buttons d-flex gap-2">
+                <button type="submit" class="btn btn-danger"
+                        onclick="return confirm('@(lang == "en" ? "Are you sure you want to delete this reservation?" : "Jeni i sigurt që doni ta fshini këtë rezervim?")');">
+                    <i class="bi bi-trash me-1"></i>
+                    @(lang == "en" ? "Delete" : "Fshi")
+                </button>
+                <a href="@Url.Action("ManageReservations", "Home", new { language = lang })" class="btn btn-secondary">
+                    <i class="bi bi-x-circle me-1"></i>
+                    @(lang == "en" ? "Cancel" : "Anulo")
+                </a>
+            </div>
+        }
+    </div>
+</div>

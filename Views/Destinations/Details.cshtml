@@ -1,0 +1,94 @@
+﻿@model DK1.Models.Destination
+
+@{
+    ViewBag.Title = "Detajet e Destinacionit";
+}
+
+<style>
+    .form-container {
+        background-color: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        padding: 2.5rem;
+        margin: 2rem auto;
+        max-width: 800px;
+    }
+
+    .form-header {
+        color: #2c3e50;
+        border-bottom: 1px solid #eaeaea;
+        padding-bottom: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #34495e;
+        margin-bottom: 0.5rem;
+    }
+
+    .btn-edit {
+        background-color: #f1c40f;
+        border: none;
+        border-radius: 8px;
+        padding: 12px 24px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        color: white;
+    }
+
+        .btn-edit:hover {
+            background-color: #d4ac0d;
+            transform: translateY(-2px);
+        }
+
+    .btn-back {
+        border-radius: 8px;
+        padding: 12px 24px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+</style>
+
+<div class="container">
+    <div class="form-container">
+        <div class="form-header">
+            <h2 class="mb-0">@Model.Name</h2>
+            <p class="text-muted mt-2">Detajet e destinacionit</p>
+        </div>
+
+        <dl class="row">
+            <dt class="col-sm-3 form-label">Rajoni</dt>
+            <dd class="col-sm-9">@Model.Region</dd>
+
+            <dt class="col-sm-3 form-label">Përshkrimi</dt>
+            <dd class="col-sm-9">@Model.Description</dd>
+
+            <dt class="col-sm-3 form-label">Kategoria</dt>
+            <dd class="col-sm-9">@(Model.Category?.Name ?? "Pa kategori")</dd>
+
+            <dt class="col-sm-3 form-label">Shpenzimi Minimal Ditor (ALL)</dt>
+            <dd class="col-sm-9">@Model.MinDailyExpenseAL</dd>
+
+            <dt class="col-sm-3 form-label">Shpenzimi Maksimal Ditor (ALL)</dt>
+            <dd class="col-sm-9">@Model.MaxDailyExpenseAL</dd>
+
+            <dt class="col-sm-3 form-label">Foto</dt>
+            <dd class="col-sm-9">
+                @if (!string.IsNullOrEmpty(Model.ImagePath))
+                {
+                    <img src="@Model.ImagePath" alt="Foto" width="200" />
+                }
+                else
+                {
+                    <span class="text-muted">Asnjë foto në dispozicion.</span>
+                }
+            </dd>
+        </dl>
+
+        <div class="d-flex justify-content-between mt-5">
+            @Html.ActionLink("Ndrysho", "Edit", new { id = Model.Id }, new { @class = "btn btn-edit" })
+            @Html.ActionLink("Kthehu te Lista", "Index", null, new { @class = "btn btn-outline-secondary btn-back" })
+        </div>
+    </div>
+</div>
