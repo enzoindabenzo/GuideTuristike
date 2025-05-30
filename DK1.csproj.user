@@ -22,7 +22,9 @@
     <WebStackScaffolding_ViewDialogWidth>600</WebStackScaffolding_ViewDialogWidth>
     <WebStackScaffolding_DbContextTypeFullName>DK1.Models.GtDb</WebStackScaffolding_DbContextTypeFullName>
     <ProjectView>ShowAllFiles</ProjectView>
-    <ActiveDebugTarget>ContainerToolsProjectDebugExtension</ActiveDebugTarget>
+    <ActiveDebugTarget>
+    </ActiveDebugTarget>
+    <NameOfLastUsedPublishProfile>C:\Users\user\source\repos\DK1\Properties\PublishProfiles\FolderProfile.pubxml</NameOfLastUsedPublishProfile>
   </PropertyGroup>
   <ProjectExtensions>
     <VisualStudio>

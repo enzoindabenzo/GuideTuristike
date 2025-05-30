@@ -1,0 +1,245 @@
+﻿@model PagedList.IPagedList<DK1.Models.Destination>
+@using PagedList.Mvc;
+@using PagedList;
+@{
+    ViewBag.Title = "Destinacionet";
+}
+
+<link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
+
+<style>
+    .form-container {
+        background-color: #ffffff;
+        border-radius: 12px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        padding: 2.5rem;
+        margin: 2rem auto;
+        max-width: 1200px;
+    }
+
+    .form-header {
+        color: #2c3e50;
+        border-bottom: 2px solid #eaeaea;
+        padding-bottom: 1.5rem;
+        margin-bottom: 2.5rem;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #34495e;
+        margin-bottom: 0.75rem;
+        font-size: 1rem;
+    }
+
+    .form-control-custom {
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 12px 16px;
+        transition: all 0.3s ease;
+        font-size: 0.95rem;
+    }
+
+        .form-control-custom:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+            outline: none;
+        }
+
+    .btn-submit {
+        background-color: #3498db;
+        border: none;
+        border-radius: 8px;
+        padding: 12px 24px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        color: white;
+        font-size: 0.95rem;
+    }
+
+        .btn-submit:hover {
+            background-color: #2980b9;
+            transform: translateY(-2px);
+        }
+
+    .btn-create {
+        background-color: #2ecc71;
+        border: none;
+        border-radius: 8px;
+        padding: 12px 24px;
+        font-weight: 600;
+        transition: all 0.3s ease;
+        color: white;
+        font-size: 0.95rem;
+    }
+
+        .btn-create:hover {
+            background-color: #27ae60;
+            transform: translateY(-2px);
+        }
+
+    .table th, .table td {
+        vertical-align: middle;
+        font-size: 0.95rem;
+    }
+
+    .table th {
+        background-color: #f8f9fa;
+        font-weight: 600;
+        color: #34495e;
+        padding: 15px;
+    }
+
+    .table td {
+        padding: 15px;
+    }
+
+    .action-links a {
+        margin-right: 12px;
+        font-size: 0.9rem;
+        transition: color 0.2s ease;
+    }
+
+        .action-links a:hover {
+            text-decoration: underline;
+        }
+
+    .filter-group {
+        display: flex;
+        gap: 2rem; /* Increased gap between filter elements */
+        align-items: flex-end;
+        flex-wrap: wrap;
+    }
+
+    .filter-item {
+        flex: 1;
+        min-width: 200px;
+        max-width: 300px;
+    }
+
+    .alert {
+        border-radius: 8px;
+        font-size: 0.95rem;
+    }
+
+    .pagination {
+        margin-top: 2rem;
+    }
+
+        .pagination .page-link {
+            border-radius: 6px;
+            margin: 0 4px;
+            color: #3498db;
+            transition: all 0.3s ease;
+        }
+
+            .pagination .page-link:hover {
+                background-color: #3498db;
+                color: white;
+            }
+
+        .pagination .active .page-link {
+            background-color: #3498db;
+            border-color: #3498db;
+            color: white;
+        }
+</style>
+
+<div class="container">
+    <div class="form-container">
+        <div class="form-header">
+            <h2 class="mb-0">Destinacionet Turistike</h2>
+            <p class="text-muted mt-2">Shfletoni dhe menaxhoni destinacionet turistike</p>
+        </div>
+
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success">
+                @TempData["SuccessMessage"]
+            </div>
+        }
+
+        @using (Html.BeginForm("Index", "Destinations", FormMethod.Get))
+        {
+            <div class="filter-group mb-4">
+                <div class="filter-item">
+                    <label for="search" class="form-label">Kërko:</label>
+                    <input type="text" name="search" value="@ViewBag.Search" class="form-control form-control-custom" />
+                </div>
+                <div class="filter-item">
+                    <label for="categoryId" class="form-label">Filtro sipas kategorisë:</label>
+                    @Html.DropDownList("categoryId", (SelectList)ViewBag.CategoryList, "Të gjitha", new { @class = "form-control form-control-custom" })
+                </div>
+                <div class="filter-item">
+                    <button type="submit" class="btn btn-submit">Kërko</button>
+                </div>
+            </div>
+        }
+
+        <div class="mb-4">
+            @Html.ActionLink("Shto Destinacion të Ri", "Create", null, new { @class = "btn btn-create" })
+        </div>
+
+        @if (!Model.Any())
+        {
+            <div class="alert alert-warning">
+                Nuk u gjetën destinacione që përputhen me kriteret e kërkimit.
+            </div>
+        }
+        else
+        {
+            <table class="table table-bordered">
+                <thead>
+                    <tr>
+                        <th>
+                            @Html.ActionLink("Emri", "Index", new { sortOrder = ViewBag.SortOrder == "name_desc" ? "" : "name_desc", categoryId = ViewBag.SelectedCategoryId })
+                        </th>
+                        <th>
+                            @Html.ActionLink("Rajoni", "Index", new { sortOrder = ViewBag.SortOrder == "region" ? "region_desc" : "region", categoryId = ViewBag.SelectedCategoryId })
+                        </th>
+                        <th>Përshkrimi</th>
+                        <th>
+                            @Html.ActionLink("Kategoria", "Index", new { sortOrder = ViewBag.SortOrder == "category" ? "category_desc" : "category", categoryId = ViewBag.SelectedCategoryId })
+                        </th>
+                        <th>Shpenzimi Minimal Ditor (ALL)</th>
+                        <th>Shpenzimi Maksimal Ditor (ALL)</th>
+                        <th>Foto</th>
+                        <th>Veprime</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td>@Html.DisplayFor(modelItem => item.Name)</td>
+                            <td>@Html.DisplayFor(modelItem => item.Region)</td>
+                            <td>@Html.DisplayFor(modelItem => item.Description)</td>
+                            <td>@Html.DisplayFor(modelItem => item.Category.Name)</td>
+                            <td>@Html.DisplayFor(modelItem => item.MinDailyExpenseAL)</td>
+                            <td>@Html.DisplayFor(modelItem => item.MaxDailyExpenseAL)</td>
+                            <td>
+                                @if (!string.IsNullOrEmpty(item.ImagePath))
+                                {
+                                    <img src="@item.ImagePath" alt="Foto" width="100" />
+                                }
+                                else
+                                {
+                                    <img src="@Url.Content("~/Content/Images/no-image.png")" alt="No Image" width="100" />
+                                }
+                            </td>
+                            <td class="action-links">
+                                @Html.ActionLink("Ndrysho", "Edit", new { id = item.Id }, new { @class = "text-warning" }) |
+                                @Html.ActionLink("Detajet", "Details", new { id = item.Id }, new { @class = "text-info" }) |
+                                @Html.ActionLink("Fshi", "Delete", new { id = item.Id }, new { @class = "text-danger" })
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+
+        <div class="text-center mt-4">
+            @Html.PagedListPager((IPagedList<DK1.Models.Destination>)Model, page => Url.Action("Index",
+                new { page, categoryId = ViewBag.SelectedCategoryId, sortOrder = ViewBag.SortOrder }))
+        </div>
+    </div>
+</div>

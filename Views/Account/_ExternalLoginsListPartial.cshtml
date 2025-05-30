@@ -16,37 +16,54 @@
     }
     else
     {
-        using (Html.BeginForm("ExternalLogin", "Account", new { ReturnUrl = Model.ReturnUrl ?? "" }))
+        using (Html.BeginForm("ExternalLogin", "Account", new { ReturnUrl = Model.ReturnUrl ?? "" }, FormMethod.Post, new { id = "externalLoginForm" }))
         {
             @Html.AntiForgeryToken()
             <div id="socialLoginList">
                 <p>
                     @foreach (AuthenticationDescription p in loginProviders)
                     {
-                        string logoPath = "/Content/default-logo.png"; // Fallback
+                        string logoPath = "/Content/default-logo.png";
                         string altText = $"{p.AuthenticationType} Login";
-                        switch (p.AuthenticationType)
+                        string buttonText = p.AuthenticationType;
+
+                        switch (p.AuthenticationType.ToLower())
                         {
-                            case "GitHub":
+                            case "github":
                                 logoPath = "/Content/github-logo.png";
                                 altText = "GitHub Login";
+                                buttonText = "GitHub";
                                 break;
-                            case "Google":
+                            case "google":
                                 logoPath = "/Content/google-logo.png";
                                 altText = "Google Login";
+                                buttonText = "Google";
                                 break;
-                            case "Facebook":
+                            case "facebook":
                                 logoPath = "/Content/facebook-logo.png";
                                 altText = "Facebook Login";
+                                buttonText = "Facebook";
                                 break;
                         }
-                        <button type="submit" class="btn btn-default" name="provider" value="@p.AuthenticationType" title="Log in using your @(p.Caption ?? p.AuthenticationType) account">
-                            <img src="@logoPath" alt="@altText" style="width: 32px; height: 32px; vertical-align: middle; margin-right: 8px;" />
-                            @p.AuthenticationType
+
+                        <button type="submit" class="btn btn-default" name="provider" value="@p.AuthenticationType"
+                                title="Log in using your @buttonText account" onclick="console.log('Submitting provider: @p.AuthenticationType')">
+                            @if (System.IO.File.Exists(Server.MapPath(logoPath)))
+                            {
+                                <img src="@logoPath" alt="@altText" style="width: 20px; height: 20px; vertical-align: middle; margin-right: 8px;" />
+                            }
+                            @buttonText
                         </button>
+                        <br />
                     }
                 </p>
             </div>
         }
     }
 }
+
+<script>
+    document.getElementById('externalLoginForm').addEventListener('submit', function (e) {
+        console.log('Form submitting with provider: ' + e.submitter.value);
+    });
+</script>

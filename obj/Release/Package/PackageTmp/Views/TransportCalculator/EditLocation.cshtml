@@ -1,0 +1,140 @@
+﻿@model DK1.Models.Cal.Location
+@{
+    ViewBag.Title = "Edit Location";
+}
+
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Ndrysho Lokacionin</h5>
+                </div>
+                <div class="card-body">
+                    @using (Html.BeginForm("EditLocationConfirmed", "TransportCalculator", FormMethod.Post, new { id = "editLocationForm" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+                        @Html.HiddenFor(m => m.Id)
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.Name)
+                                    @Html.TextBoxFor(m => m.Name, new { @class = "form-control", required = "required" })
+                                    @Html.ValidationMessageFor(m => m.Name, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.Region)
+                                    @Html.TextBoxFor(m => m.Region, new { @class = "form-control", required = "required" })
+                                    @Html.ValidationMessageFor(m => m.Region, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group mb-3">
+                            <label>Ndrysho lokacionin në hartë:</label>
+                            <div id="editMap" style="height: 400px; width: 100%;"></div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.Latitude)
+                                    @Html.TextBoxFor(m => m.Latitude, new { @class = "form-control", type = "number", step = "0.000001", required = "required", id = "EditLatitude", @readonly = "readonly" })
+                                    @Html.ValidationMessageFor(m => m.Latitude, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.Longitude)
+                                    @Html.TextBoxFor(m => m.Longitude, new { @class = "form-control", type = "number", step = "0.000001", required = "required", id = "EditLongitude", @readonly = "readonly" })
+                                    @Html.ValidationMessageFor(m => m.Longitude, "", new { @class = "text-danger" })
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-check mb-3">
+                            @Html.CheckBoxFor(m => m.IsPopularDestination, new { @class = "form-check-input" })
+                            @Html.LabelFor(m => m.IsPopularDestination, new { @class = "form-check-label" })
+                        </div>
+
+                        <div class="form-group mt-4">
+                            <button type="submit" class="btn btn-primary">Ruaj Ndryshimet</button>
+                            <a href="@Url.Action("ManageLocations", "TransportCalculator")" class="btn btn-secondary ms-2">Kthehu</a>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Styles {
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+}
+
+@section Scripts {
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script>
+        $(document).ready(function () {
+            // Get the current coordinates
+            var currentLat = parseFloat($('#EditLatitude').val());
+            var currentLng = parseFloat($('#EditLongitude').val());
+
+            // Initialize the map centered on the location
+            var map = L.map('editMap').setView([currentLat, currentLng], 13);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+            }).addTo(map);
+
+            // Add a marker at the location
+            var marker = L.marker([currentLat, currentLng], {
+                draggable: true
+            }).addTo(map);
+
+            // Update lat/lng fields when marker is dragged
+            marker.on('dragend', function (e) {
+                updateCoordinates(e.target.getLatLng());
+            });
+
+            // Update lat/lng fields when map is clicked
+            map.on('click', function (e) {
+                marker.setLatLng(e.latlng);
+                updateCoordinates(e.latlng);
+            });
+
+            // Function to update coordinate fields
+            function updateCoordinates(latlng) {
+                $('#EditLatitude').val(latlng.lat.toFixed(6));
+                $('#EditLongitude').val(latlng.lng.toFixed(6));
+            }
+
+            // Validate form on submission
+            $('#editLocationForm').submit(function (e) {
+                let lat = parseFloat($('#EditLatitude').val());
+                let lng = parseFloat($('#EditLongitude').val());
+
+                // Rough bounds for Albania
+                if (lat < 39 || lat > 43) {
+                    alert("Latitude should be between 39° and 43° for Albania");
+                    e.preventDefault();
+                    return false;
+                }
+
+                if (lng < 19 || lng > 21.5) {
+                    alert("Longitude should be between 19° and 21.5° for Albania");
+                    e.preventDefault();
+                    return false;
+                }
+            });
+        });
+    </script>
+}

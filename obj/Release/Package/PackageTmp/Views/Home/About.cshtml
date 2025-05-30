@@ -1,0 +1,846 @@
+﻿@{
+    ViewBag.Title = ViewBag.Language == "en" ? "About Us" : "Rreth Nesh";
+    var lang = ViewBag.Language as string ?? "sq"; // default Shqip
+}
+
+<style>
+:root {
+    --primary: #4F6F52;
+    --primary-dark: #3A5239;
+    --primary-light: #739E77;
+    --secondary: #ECE3CE;
+    --accent: #86A789;
+    --accent-dark: #6B8A6E;
+    --body-bg-light: #F9F9F7;
+    --body-bg-dark: #252525;
+    --card-bg-dark: #333333;
+    --light: #ffffff;
+    --text-dark: #333333;
+    --text-light: #f5f5f5;
+}
+
+[data-bs-theme="light"] {
+    --body-bg: var(--body-bg-light);
+    --card-bg: var(--light);
+    --text-color: var(--text-dark);
+    --header-bg: var(--light);
+    --border-color: #dee2e6;
+}
+
+[data-bs-theme="dark"] {
+    --body-bg: var(--body-bg-dark);
+    --card-bg: var(--card-bg-dark);
+    --text-color: var(--text-light);
+    --header-bg: #1A1A1A;
+    --border-color: #444;
+}
+
+body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    background-color: var(--body-bg);
+    color: var(--text-color);
+    transition: all 0.3s ease;
+}
+
+.text-primary {
+    color: var(--primary) !important;
+}
+
+.bg-primary {
+    background-color: var(--primary) !important;
+}
+
+.btn-primary {
+    background-color: var(--primary);
+    border-color: var(--primary-dark);
+}
+
+.btn-primary:hover {
+    background-color: var(--primary-dark);
+    border-color: var(--primary-dark);
+}
+
+.btn-outline-primary {
+    color: var(--primary);
+    border-color: var(--primary);
+}
+
+.btn-outline-primary:hover {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    color: white;
+}
+
+/* Hero Section */
+.hero-section {
+    background: linear-gradient(135deg, rgba(79, 111, 82, 0.15) 0%, rgba(236, 227, 206, 0.1) 100%);
+    border-radius: 1rem;
+    padding: 4rem 2rem;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 4rem;
+    z-index: 2;
+    border-left: 5px solid var(--primary);
+}
+
+.hero-section::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path fill="none" stroke="%234F6F52" stroke-width="0.5" stroke-opacity="0.2" d="M0,0 L100,100 M100,0 L0,100" /></svg>');
+    background-size: 100% 100%;
+    opacity: 0.15;
+    z-index: -1;
+}
+
+.hero-section .btn-primary {
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.hero-section .btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 8px rgba(0,0,0,0.15);
+}
+
+/* Responsive Adjustments for Hero Section */
+@@media (max-width: 768px) {
+    .hero-section {
+        margin-bottom: 3rem;
+        padding: 3rem 1rem;
+    }
+    .hero-title {
+        font-size: 2.5rem;
+    }
+}
+
+@@media (max-width: 576px) {
+    .hero-section {
+        margin-bottom: 2.5rem;
+    }
+    .hero-title {
+        font-size: 2rem;
+    }
+    .hero-subtitle {
+        font-size: 1rem;
+    }
+}
+
+/* Existing Hero Title and Subtitle Styles */
+.hero-title {
+    font-weight: 800;
+    font-size: 3rem;
+    margin-bottom: 1.5rem;
+    position: relative;
+    display: inline-block;
+}
+
+.hero-title::after {
+    content: '';
+    position: absolute;
+    width: 60%;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+    bottom: -10px;
+    left: 20%;
+    border-radius: 2px;
+}
+
+.hero-subtitle {
+    font-size: 1.25rem;
+    max-width: 700px;
+    margin: 0 auto 2rem;
+}
+
+/* Feature Cards */
+.feature-card {
+    border: none;
+    border-radius: 1rem;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    background-color: var(--card-bg);
+    height: 100%;
+    margin-bottom: 2rem;
+}
+
+.feature-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.feature-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: white;
+    font-size: 2rem;
+}
+
+/* Team Section */
+.team-section {
+    background: linear-gradient(135deg, rgba(79, 111, 82, 0.08) 0%, rgba(134, 167, 137, 0.06) 100%);
+    border-radius: 1rem;
+    padding: 3rem;
+    margin-bottom: 4rem;
+    border-top: 4px solid var(--accent);
+}
+
+.team-member {
+    text-align: center;
+    margin-bottom: 2rem;
+    background-color: var(--card-bg);
+    padding: 1.5rem;
+    border-radius: 1rem;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+}
+
+.team-member:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.team-photo {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin: 0 auto 1.5rem;
+    border: 4px solid var(--primary);
+    box-shadow: 0 0 0 4px rgba(79, 111, 82, 0.3);
+}
+
+.team-photo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+/* About content */
+.about-content {
+    border-radius: 1rem;
+    background-color: var(--card-bg);
+    padding: 2rem;
+    margin-bottom: 3rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border-left: 3px solid var(--primary);
+}
+
+.about-icon {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1.5rem;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    color: white;
+    font-size: 1.5rem;
+}
+
+/* Section Headings */
+.section-heading {
+    margin-bottom: 3rem;
+    position: relative;
+    display: inline-block;
+}
+
+.section-heading::after {
+    content: '';
+    position: absolute;
+    width: 50%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary), var(--secondary));
+    bottom: -10px;
+    left: 25%;
+    border-radius: 2px;
+    pointer-events: none;
+}
+
+/* Timeline */
+.timeline {
+    position: relative;
+    padding-left: 2rem;
+}
+
+.timeline::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 3px;
+    background: linear-gradient(to bottom, var(--primary), var(--accent));
+    border-radius: 1.5px;
+}
+
+.timeline-item {
+    position: relative;
+    padding-bottom: 2rem;
+    padding-left: 0.5rem;
+}
+
+.timeline-item::before {
+    content: '';
+    position: absolute;
+    left: -2.25rem;
+    top: 0.5rem;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background-color: var(--accent);
+    border: 3px solid var(--body-bg);
+    box-shadow: 0 0 0 3px rgba(79, 111, 82, 0.2);
+}
+
+.timeline-date {
+    color: var(--primary);
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    background-color: rgba(79, 111, 82, 0.1);
+    border-radius: 1rem;
+}
+
+/* Contact Form Styles */
+.contact-form {
+    background-color: var(--card-bg);
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+    border-left: 3px solid var(--primary);
+}
+
+.form-control:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 0.25rem rgba(79, 111, 82, 0.25);
+}
+
+.contact-info {
+    padding: 1.5rem;
+    background-color: rgba(79, 111, 82, 0.1);
+    border-radius: 1rem;
+    margin-bottom: 2rem;
+}
+
+.contact-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background-color: var(--primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 1rem;
+    font-size: 1.25rem;
+}
+
+.contact-method {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.contact-method:last-child {
+    margin-bottom: 0;
+}
+
+.btn-contact {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    color: white;
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+}
+
+.btn-contact:hover {
+    background-color: var(--primary-dark);
+    border-color: var(--primary-dark);
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(79, 111, 82, 0.3);
+}
+
+.partner-logo {
+    height: 100px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+    border-radius: 0.5rem;
+    background-color: var(--card-bg);
+    transition: all 0.3s ease;
+    margin-bottom: 1.5rem;
+    border: 1px solid rgba(79, 111, 82, 0.2);
+}
+
+.partner-logo:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 5px 15px rgba(79, 111, 82, 0.15);
+    border-color: var(--primary);
+}
+
+.partner-logo img {
+    max-width: 100%;
+    max-height: 70px;
+    filter: grayscale(100%);
+    opacity: 0.8;
+    transition: all 0.3s ease;
+}
+
+.partner-logo:hover img {
+    filter: grayscale(0%);
+    opacity: 1;
+}
+
+/* CTA Section */
+.cta-section {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    border-radius: 1rem;
+    padding: 4rem 2rem;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 4rem;
+}
+
+.cta-section::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="none"><path fill="none" stroke="white" stroke-width="0.5" stroke-opacity="0.1" d="M0,0 L100,100 M100,0 L0,100" /></svg>');
+    background-size: 100% 100%;
+    opacity: 0.1;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.cta-btn {
+    background-color: white;
+    color: var(--primary);
+    border: none;
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+    border-radius: 50px;
+    transition: all 0.3s ease;
+}
+
+.cta-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Image container */
+.image-container {
+    width: 100%;
+    height: 400px;
+    max-width: 600px;
+    margin: 0 auto;
+    border-radius: 1rem;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
+@@media (max-width: 768px) {
+    .image-container {
+        height: 350px;
+    }
+    .team-section,
+    .about-content {
+        padding: 2rem 1rem;
+    }
+    .timeline {
+        padding-left: 1.5rem;
+    }
+    .timeline-item::before {
+        left: -1.75rem;
+    }
+}
+
+@@media (max-width: 576px) {
+    .image-container {
+        height: 300px;
+    }
+    .timeline {
+        padding-left: 1.25rem;
+    }
+    .timeline-item::before {
+        left: -1.5rem;
+        width: 12px;
+        height: 12px;
+    }
+}
+
+</style>
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Bootstrap Icons Test</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+</head>
+<div class="d-flex justify-content-end mb-5">
+    <div class="d-flex gap-3">
+        <button class="btn btn-outline-primary" id="themeToggle">
+            <i class="bi bi-sun-fill d-none"></i>
+            <i class="bi bi-moon-fill"></i>
+        </button>
+    </div>
+</div>
+<section class="hero-section text-center position-relative">
+    <div class="container">
+        <h1 class="hero-title">
+            Rreth Nesh
+        </h1>
+        <p class="hero-subtitle">
+            Njihuni me ekipin dhe historinë e guidës turistike që po sjell eksperienca unike në zonat rurale të Shqipërisë
+        </p>
+    </div>
+</section>
+
+<!-- About Us Content -->
+<section class="mb-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6 mb-4">
+                <div class="about-content">
+                    <div class="about-icon">
+                        <i class="bi bi-book"></i>
+                    </div>
+                    <h3 class="mb-4">Historia Jonë</h3>
+                    <p>EnzoTravel u krijua në vitin 2022 nga një grup të rinjsh entuziastë, me pasion për natyrën dhe traditën shqiptare. Nisma jonë ka lindur nga dëshira për të promovuar zonat e veçanta rurale të Shqipërisë, të cilat shpesh mbeten larg vëmendjes së turistëve tradicionalë.</p>
+                    <p>Me kalimin e kohës, ne jemi shndërruar në një ekip të dedikuar që punon për të zbuluar dhe promovuar destinacionet më autentike, traditat dhe gastronominë e zonave rurale në të gjithë vendin.</p>
+                </div>
+            </div>
+            <div class="col-lg-6 mb-4">
+                <div class="about-content">
+                    <div class="about-icon">
+                        <i class="bi bi-bullseye"></i>
+                    </div>
+                    <h3 class="mb-4">Misioni Ynë</h3>
+                    <p>Ne synojmë të krijojmë një urë lidhëse mes turistëve vendas e të huaj dhe fshatrave pitoreske shqiptare, duke nxitur turizmin e qëndrueshëm që respekton natyrën dhe traditat lokale.</p>
+                    <p>Misioni ynë është të mbështesim komunitetet lokale, duke nxitur zhvillimin ekonomik dhe duke ruajtur në të njëjtën kohë trashëgiminë kulturore dhe natyrore të zonave tona të bukura rurale.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12 mb-5">
+                <div class="about-content">
+                    <div class="about-icon">
+                        <i class="bi bi-check2-square"></i>
+                    </div>
+                    <h3 class="mb-4">Vlerat Tona</h3>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <h5><i class="bi bi-tree me-2 text-primary"></i> Qëndrueshmëria</h5>
+                            <p>Promovimi i turizmit të qëndrueshëm që mbron mjedisin natyror dhe kulturor.</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <h5><i class="bi bi-people me-2 text-primary"></i> Komuniteti</h5>
+                            <p>Mbështetja për komunitetet vendase dhe bashkëpunimi me banorët lokalë.</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <h5><i class="bi bi-heart me-2 text-primary"></i> Autenticiteti</h5>
+                            <p>Promovimi i eksperiencave të vërteta që pasqyrojnë traditat dhe kulturën shqiptare.</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <h5><i class="bi bi-stars me-2 text-primary"></i> Kreativiteti</h5>
+                            <p>Gjetja e mënyrave inovative për të nxjerrë në pah bukuritë e fshehura të Shqipërisë.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Our Journey Section -->
+<section class="mb-5">
+    <div class="container">
+        <h2 class="text-center section-heading mb-5">Rrugëtimi Ynë</h2>
+        <div class="timeline">
+            <div class="timeline-item">
+                <div class="timeline-date">2022</div>
+                <h4>Fillimi i Udhëtimit</h4>
+                <p>Guida Turistike Rurale filloi si një blog i thjeshtë për të ndarë përvojat e udhëtimeve në zonat rurale të Shqipërisë.</p>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-date">2023</div>
+                <h4>Rritja e Komunitetit</h4>
+                <p>Krijimi i rrjetit të parë të bujtinave dhe guidave lokale, duke bashkuar mbi 15 fshatra nga rajonet e ndryshme të vendit.</p>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-date">2024</div>
+                <h4>Platforma Digjitale</h4>
+                <p>Lansimi i platformës digjitale me planifikues udhëtimi dhe informacion të detajuar për çdo destinacion.</p>
+            </div>
+            <div class="timeline-item">
+                <div class="timeline-date">2025</div>
+                <h4>Ekspansioni</h4>
+                <p>Zgjerimi i shërbimeve në të gjithë rajonin e Ballkanit Perëndimor dhe krijimi i programeve të shkëmbimit kulturor.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Team Section -->
+<section class="team-section">
+    <div class="container">
+        <h2 class="text-center section-heading">Ekipi Ynë</h2>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="team-member">
+                    <div class="team-photo">
+                        <img src="~/Content/Images/EH.jpg" alt="Drejtor Ekzekutiv">
+                    </div>
+                    <h4>Kristoferian Augustinus Pushi</h4>
+                    <p class="text-primary">Drejtor Ekzekutiv</p>
+                    <p>Me eksperiencë 10-vjeçare në turizëm dhe pasion për natyrën shqiptare.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="team-member">
+                    <div class="team-photo">
+                        <img src="~/Content/Images/KT.jpg" alt="Koordinatore Guidash">
+                    </div>
+                    <h4>Bora Dervishi</h4>
+                    <p class="text-primary">Koordinatore Guidash</p>
+                    <p>Specialiste në turizëm rural dhe promovimin e traditave lokale.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="team-member">
+                    <div class="team-photo">
+                        <img src="~/Content/Images/BT.jpg" alt="Zhvillues Digjital">
+                    </div>
+                    <h4>Klea Tomorri</h4>
+                    <p class="text-primary">Zhvillues Digjital</p>
+                    <p>Eksperte në teknologji dhe krijues i platformave digjitale për turizëm.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Partners Section -->
+<section class="partners-section">
+    <div class="container">
+        <h2 class="text-center section-heading">Partnerët Tanë</h2>
+        <div class="row">
+            <div class="col-md-3 col-6">
+                <div class="partner-logo">
+                    <img src="~/Content/Images/ETG.png" alt="Partner 1">
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="partner-logo">
+                    <img src="~/Content/Images/OA.png" alt="Partner 2">
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="partner-logo">
+                    <img src="~/Content/Images/ST.jpg" alt="Partner 3">
+                </div>
+            </div>
+            <div class="col-md-3 col-6">
+                <div class="partner-logo">
+                    <img src="~/Content/Images/ATA.jpg" alt="Partner 4">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section with Contact Form -->
+<section class="mb-5">
+    <div class="container">
+        <h2 class="text-center section-heading mb-5">Na Kontaktoni</h2>
+        <div class="row">
+            <div class="col-lg-5 mb-4">
+                <div class="contact-info">
+                    <h4 class="mb-4">Informacione Kontakti</h4>
+
+                    <div class="contact-method">
+                        <div class="contact-icon">
+                            <i class="bi bi-telephone"></i>
+                        </div>
+                        <div>
+                            <h5>Telefon</h5>
+                            <p class="mb-0">+355 69 123 4567</p>
+                        </div>
+                    </div>
+
+                    <div class="contact-method">
+                        <div class="contact-icon">
+                            <i class="bi bi-envelope"></i>
+                        </div>
+                        <div>
+                            <h5>Email</h5>
+                            <p class="mb-0">info@guidarurale.al</p>
+                        </div>
+                    </div>
+
+                    <div class="contact-method">
+                        <div class="contact-icon">
+                            <i class="bi bi-geo-alt"></i>
+                        </div>
+                        <div>
+                            <h5>Adresa</h5>
+                            <p class="mb-0">Rruga "Myslym Shyri", Nr. 42<br>Tiranë, Shqipëri</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="social-media mt-4">
+                    <h5 class="mb-3">Na ndiqni</h5>
+                    <div class="d-flex gap-3">
+                        <a href="#" class="btn btn-outline-primary rounded-circle p-2" title="Facebook">
+                            <i class="bi bi-facebook"></i>
+                        </a>
+                        <a href="#" class="btn btn-outline-primary rounded-circle p-2" title="Instagram">
+                            <i class="bi bi-instagram"></i>
+                        </a>
+                        <a href="#" class="btn btn-outline-primary rounded-circle p-2" title="Twitter">
+                            <i class="bi bi-twitter-x"></i>
+                        </a>
+                        <a href="#" class="btn btn-outline-primary rounded-circle p-2" title="LinkedIn">
+                            <i class="bi bi-linkedin"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-7">
+                <div class="contact-form">
+                    <h4 class="mb-4">Dërgoni një mesazh</h4>
+
+                    <form id="contactForm">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="name" class="form-label">Emri juaj</label>
+                                <input type="text" class="form-control" id="name" placeholder="Shkruani emrin tuaj" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">Email-i juaj</label>
+                                <input type="email" class="form-control" id="email" placeholder="Shkruani email-in tuaj" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="subject" class="form-label">Subjekti</label>
+                            <input type="text" class="form-control" id="subject" placeholder="Shkruani subjektin e mesazhit" required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="message" class="form-label">Mesazhi juaj</label>
+                            <textarea class="form-control" id="message" rows="5" placeholder="Shkruani mesazhin tuaj" required></textarea>
+                        </div>
+                        <div class="text-end">
+                            <button type="submit" class="btn btn-contact">
+                                <i class="bi bi-send me-2"></i>
+                                Dërgo Mesazhin
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        // Theme toggle functionality
+        const themeToggle = document.getElementById('themeToggle');
+        const sunIcon = themeToggle.querySelector('.bi-sun-fill');
+        const moonIcon = themeToggle.querySelector('.bi-moon-fill');
+
+        // Check for saved theme preference or use system preference
+        const savedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+        if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
+            document.documentElement.setAttribute('data-bs-theme', 'dark');
+            sunIcon.classList.remove('d-none');
+            moonIcon.classList.add('d-none');
+        } else {
+            document.documentElement.setAttribute('data-bs-theme', 'light');
+            moonIcon.classList.remove('d-none');
+            sunIcon.classList.add('d-none');
+        }
+
+        themeToggle.addEventListener('click', function () {
+            const currentTheme = document.documentElement.getAttribute('data-bs-theme');
+            if (currentTheme === 'light') {
+                document.documentElement.setAttribute('data-bs-theme', 'dark');
+                localStorage.setItem('theme', 'dark');
+                sunIcon.classList.remove('d-none');
+                moonIcon.classList.add('d-none');
+            } else {
+                document.documentElement.setAttribute('data-bs-theme', 'light');
+                localStorage.setItem('theme', 'light');
+                moonIcon.classList.remove('d-none');
+                sunIcon.classList.add('d-none');
+            }
+        });
+
+        // Listen for system theme changes
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+            if (!localStorage.getItem('theme')) {
+                if (e.matches) {
+                    document.documentElement.setAttribute('data-bs-theme', 'dark');
+                    sunIcon.classList.remove('d-none');
+                    moonIcon.classList.add('d-none');
+                } else {
+                    document.documentElement.setAttribute('data-bs-theme', 'light');
+                    moonIcon.classList.remove('d-none');
+                    sunIcon.classList.add('d-none');
+                }
+            }
+        });
+
+        // Contact Form handling
+        const contactForm = document.getElementById('contactForm');
+        if (contactForm) {
+            contactForm.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                // Get form values
+                const name = document.getElementById('name').value;
+                const email = document.getElementById('email').value;
+                const subject = document.getElementById('subject').value;
+                const message = document.getElementById('message').value;
+
+                // Here you would normally send the data to your server
+                console.log('Form submitted with:', { name, email, subject, message });
+
+                // Show success message
+                alert('Faleminderit! Mesazhi juaj u dërgua me sukses. Do t\'ju kontaktojmë së shpejti.');
+
+                // Reset form
+                contactForm.reset();
+            });
+        }
+    });
+</script>

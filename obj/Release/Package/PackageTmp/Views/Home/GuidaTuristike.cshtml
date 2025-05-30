@@ -1,0 +1,386 @@
+﻿@using DK1.Models
+@model List<Destination>
+@{
+    ViewBag.Title = ViewBag.Language == "en" ? "Tourist Guide" : "Guida Turistike";
+    var lang = ViewBag.Language as string ?? "sq"; // default Shqip
+}
+
+<!DOCTYPE html>
+<html lang="@lang" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>@ViewBag.Title</title>
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <style>
+        :root {
+            --primary: #4F6F52;
+            --primary-dark: #3A4D39;
+            --secondary: #ECE3CE;
+            --light: #F5F5F5;
+            --dark: #212529;
+            --gray: #6C757D;
+            --body-bg-light: #FFFFFF;
+            --body-bg-dark: #121212;
+            --card-bg-dark: #1E1E1E;
+            --text-light: #F8F9FA;
+            --text-dark: #212529;
+            --expense-bg-light: #E8F5E8;
+            --expense-bg-dark: #2D4A2F;
+            --expense-border-light: #4F6F52;
+            --expense-border-dark: #7A9A7D;
+        }
+
+        [data-bs-theme="light"] {
+            --body-bg: var(--body-bg-light);
+            --card-bg: var(--light);
+            --text-color: var(--text-dark);
+            --header-bg: var(--light);
+            --border-color: #dee2e6;
+            --expense-bg: var(--expense-bg-light);
+            --expense-border: var(--expense-border-light);
+        }
+
+        [data-bs-theme="dark"] {
+            --body-bg: var(--body-bg-dark);
+            --card-bg: var(--card-bg-dark);
+            --text-color: var(--text-light);
+            --header-bg: #1A1A1A;
+            --border-color: #444;
+            --expense-bg: var(--expense-bg-dark);
+            --expense-border: var(--expense-border-dark);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: var(--body-bg);
+            color: var(--text-color);
+            transition: all 0.3s ease;
+        }
+
+        .text-primary {
+            color: var(--primary) !important;
+        }
+
+        .bg-primary {
+            background-color: var(--primary) !important;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            border-color: var(--primary-dark);
+        }
+
+            .btn-primary:hover {
+                background-color: var(--primary-dark);
+                border-color: var(--primary-dark);
+            }
+
+        .btn-outline-primary {
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+
+            .btn-outline-primary:hover {
+                background-color: var(--primary);
+                border-color: var(--primary);
+                color: white;
+            }
+
+        /* Spacing around filter form */
+        form.form-inline {
+            padding: 1rem 0;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        /* Grid layout with spacing */
+        .destinations-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2.5rem;
+            padding-bottom: 2rem;
+        }
+
+        @@media (max-width: 991.98px) {
+            .destinations-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @@media (max-width: 575.98px) {
+            .destinations-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            border: none;
+            border-radius: 1rem;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            background-color: var(--card-bg);
+        }
+
+            .card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            }
+
+        .destination-image-container {
+            width: 100%;
+            height: 250px;
+            margin: 0 auto;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--body-bg);
+        }
+
+        .destination-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .card:hover .destination-image {
+            transform: scale(1.05);
+        }
+
+        .spacing-separator {
+            border-bottom: 1px solid var(--border-color);
+            margin-top: 30px;
+            margin-bottom: 30px;
+        }
+
+        .form-control {
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            border-color: var(--border-color);
+        }
+
+        .alert-info {
+            background-color: rgba(79, 111, 82, 0.1);
+            border-color: rgba(79, 111, 82, 0.3);
+            color: var(--text-color);
+        }
+
+        /* Daily expense styling */
+        .daily-expense {
+            background-color: var(--expense-bg);
+            border: 2px solid var(--expense-border);
+            border-radius: 0.75rem;
+            padding: 0.75rem;
+            margin: 1rem 0;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .daily-expense::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--primary-dark));
+        }
+
+        .expense-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .expense-amount {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--text-color);
+            line-height: 1.2;
+        }
+
+        .expense-median {
+            font-size: 0.9rem;
+            color: var(--gray);
+            margin-top: 0.25rem;
+            font-style: italic;
+        }
+
+        .no-expense {
+            color: var(--gray);
+            font-style: italic;
+            font-size: 0.9rem;
+        }
+    </style>
+    <meta charset="UTF-8" />
+    <title>Bootstrap Icons Test</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
+</head>
+
+<body>
+    <div class="d-flex justify-content-end mb-5">
+        <div class="d-flex gap-3">
+            <button class="btn btn-outline-primary" id="themeToggle">
+                <i class="bi bi-sun-fill d-none"></i>
+                <i class="bi bi-moon-fill"></i>
+            </button>
+        </div>
+    </div>
+    <div class="container py-4 py-lg-5">
+
+        <!-- Filters and Search -->
+        <div class="row mb-4">
+            <div class="col-md-8 mx-auto">
+                <form method="get" class="form-inline justify-content-center">
+                    <div class="form-group mr-3 mb-3">
+                        <label for="categoryId" class="mr-2">@(lang == "en" ? "Category:" : "Kategoria:")</label>
+                        @Html.DropDownList("categoryId", (SelectList)ViewBag.CategoryList, lang == "en" ? "All" : "Të gjitha", new { @class = "form-control", onchange = "this.form.submit()" })
+                    </div>
+                    <div class="form-group mr-3 mb-3">
+                        <input type="text" name="search" class="form-control" placeholder="@(lang == "en" ? "Search by name..." : "Kërko sipas emrit...")" value="@Request.QueryString["search"]" />
+                    </div>
+                    <input type="hidden" name="sortOrder" value="@ViewBag.SortOrder" />
+                    <input type="hidden" name="language" value="@lang" />
+                    <button type="submit" class="btn btn-primary mb-3">@(lang == "en" ? "Search" : "Kërko")</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="spacing-separator mt-4 mb-4"></div>
+
+        @if (!Model.Any())
+        {
+            <div class="alert alert-info text-center">
+                @(lang == "en" ? "No results found for your search." : "Nuk ka rezultate për kërkimin tuaj.")
+            </div>
+        }
+        else
+        {
+            <!-- Card Grid for destinations -->
+            <div class="destinations-row" id="destinationsGrid">
+                @foreach (var item in Model)
+                {
+                <div class="card h-100 shadow" data-id="@item.Id">
+                    <div class="destination-image-container">
+                        @if (!string.IsNullOrEmpty(item.ImagePath))
+                        {
+                            <img src="@Url.Content(item.ImagePath)" class="card-img-top destination-image" alt="@item.Name" />
+                        }
+                        else
+                        {
+                            <img src="@Url.Content("~/Content/Images/no-image.png")" class="card-img-top destination-image" alt="No Image" />
+                        }
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">@item.Name</h5>
+                        <p><strong>@(lang == "en" ? "Region:" : "Rajoni:")</strong> @item.Region</p>
+                        <p><strong>@(lang == "en" ? "Category:" : "Kategoria:")</strong> @(item.Category != null ? item.Category.Name : lang == "en" ? "No category" : "Pa kategori")</p>
+
+                        <!-- Daily Expense Section -->
+                        <div class="daily-expense">
+                            <div class="expense-label">
+                                <i class="bi bi-wallet2 me-1"></i>
+                                @(lang == "en" ? "Daily Budget" : "Buxheti Ditor")
+                            </div>
+                            @if (!string.IsNullOrEmpty(item.DailyExpenseRange))
+                            {
+                                <div class="expense-amount">@item.DailyExpenseRange</div>
+                                if (item.MedianDailyExpenseAL.HasValue)
+                                {
+                                    <div class="expense-median">
+                                        @(lang == "en" ? "Median:" : "Mesatarja:") @item.MedianDailyExpenseAL.Value.ToString("N0") ALL
+                                    </div>
+                                }
+                            }
+                            else
+                            {
+                                <div class="no-expense">@(lang == "en" ? "Contact for pricing" : "Kontaktoni për çmime")</div>
+                            }
+                        </div>
+
+                        <p class="destination-description">
+                            @if (item.Description != null && item.Description.Length > 150)
+                            {
+                                @(item.Description.Substring(0, 150) + "...")
+                            }
+                            else
+                            {
+                                @item.Description
+                            }
+                        </p>
+                    </div>
+                    <div class="card-footer bg-transparent border-0 pt-0">
+                        <div class="d-grid gap-2">
+                            <a href="@Url.Action("DestinationPdf", "Home", new { id = item.Id, language = lang })" class="btn btn-primary" target="_blank" rel="noopener">
+                                <i class="bi bi-file-earmark-pdf me-2"></i> @(lang == "en" ? "Download PDF" : "Shkarko si PDF")
+                            </a>
+                            <a href="@Url.Action("ReservationForm", "Home", new { id = item.Id, language = lang })" class="btn btn-outline-primary">
+                                <i class="bi bi-calendar-check me-2"></i> @(lang == "en" ? "Make Reservation" : "Bëj Rezervim")
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                }
+            </div>
+        }
+    </div>
+
+    <script>
+        // Theme toggle functionality (unchanged)
+        document.addEventListener('DOMContentLoaded', function () {
+            const themeToggle = document.getElementById('themeToggle');
+            const sunIcon = themeToggle.querySelector('.bi-sun-fill');
+            const moonIcon = themeToggle.querySelector('.bi-moon-fill');
+
+            const savedTheme = localStorage.getItem('theme');
+            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+            if (savedTheme === 'dark' || (!savedTheme && systemPrefersDark)) {
+                document.documentElement.setAttribute('data-bs-theme', 'dark');
+                sunIcon.classList.remove('d-none');
+                moonIcon.classList.add('d-none');
+            } else {
+                document.documentElement.setAttribute('data-bs-theme', 'light');
+                moonIcon.classList.remove('d-none');
+                sunIcon.classList.add('d-none');
+            }
+
+            themeToggle.addEventListener('click', function () {
+                const currentTheme = document.documentElement.getAttribute('data-bs-theme');
+                if (currentTheme === 'light') {
+                    document.documentElement.setAttribute('data-bs-theme', 'dark');
+                    localStorage.setItem('theme', 'dark');
+                    sunIcon.classList.remove('d-none');
+                    moonIcon.classList.add('d-none');
+                } else {
+                    document.documentElement.setAttribute('data-bs-theme', 'light');
+                    localStorage.setItem('theme', 'light');
+                    moonIcon.classList.remove('d-none');
+                    sunIcon.classList.add('d-none');
+                }
+            });
+
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e => {
+                if (!localStorage.getItem('theme')) {
+                    if (e.matches) {
+                        document.documentElement.setAttribute('data-bs-theme', 'dark');
+                        sunIcon.classList.remove('d-none');
+                        moonIcon.classList.add('d-none');
+                    } else {
+                        document.documentElement.setAttribute('data-bs-theme', 'light');
+                        moonIcon.classList.remove('d-none');
+                        sunIcon.classList.add('d-none');
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

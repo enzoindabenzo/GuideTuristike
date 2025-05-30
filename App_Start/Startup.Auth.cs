@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
+using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.Google;
 using Microsoft.Owin.Security.Facebook;
@@ -13,62 +15,141 @@ namespace DK1
 {
     public partial class Startup
     {
-        // For more information on configuring authentication, please visit https://go.microsoft.com/fwlink/?LinkId=301864
         public void ConfigureAuth(IAppBuilder app)
         {
-            // Configure the db context, user manager and signin manager to use a single instance per request
-            app.CreatePerOwinContext(ApplicationDbContext.Create);
+            // Configure the db context, user manager, and sign-in manager
+            app.CreatePerOwinContext<ApplicationDbContext>(ApplicationDbContext.Create);
             app.CreatePerOwinContext<ApplicationUserManager>(ApplicationUserManager.Create);
             app.CreatePerOwinContext<ApplicationSignInManager>(ApplicationSignInManager.Create);
 
-            // Enable the application to use a cookie to store information for the signed in user
-            // and to use a cookie to temporarily store information about a user logging in with a third party login provider
-            // Configure the sign in cookie
+            // Enable cookie authentication
             app.UseCookieAuthentication(new CookieAuthenticationOptions
             {
                 AuthenticationType = DefaultAuthenticationTypes.ApplicationCookie,
                 LoginPath = new PathString("/Account/Login"),
+                ExpireTimeSpan = TimeSpan.FromMinutes(60), // Set explicit expiration
+                SlidingExpiration = true,
                 Provider = new CookieAuthenticationProvider
                 {
-                    // Enables the application to validate the security stamp when the user logs in.
-                    // This is a security feature which is used when you change a password or add an external login to your account.  
                     OnValidateIdentity = SecurityStampValidator.OnValidateIdentity<ApplicationUserManager, ApplicationUser>(
                         validateInterval: TimeSpan.FromMinutes(30),
                         regenerateIdentity: (manager, user) => user.GenerateUserIdentityAsync(manager))
-                }
+                },
+                CookieManager = new Microsoft.Owin.Host.SystemWeb.SystemWebCookieManager()
             });
+
             app.UseExternalSignInCookie(DefaultAuthenticationTypes.ExternalCookie);
 
-            // Enables the application to temporarily store user information when they are verifying the second factor in the two-factor authentication process.
+            // Configure two-factor authentication cookies
             app.UseTwoFactorSignInCookie(DefaultAuthenticationTypes.TwoFactorCookie, TimeSpan.FromMinutes(5));
-
-            // Enables the application to remember the second login verification factor such as phone or email.
-            // Once you check this option, your second step of verification during the login process will be remembered on the device where you logged in from.
-            // This is similar to the RememberMe option when you log in.
             app.UseTwoFactorRememberBrowserCookie(DefaultAuthenticationTypes.TwoFactorRememberBrowserCookie);
 
-            // Configure GitHub Authentication
-            app.UseGitHubAuthentication(new GitHubAuthenticationOptions
-            {
-                ClientId = System.Configuration.ConfigurationManager.AppSettings["GitHub:ClientId"],
-                ClientSecret = System.Configuration.ConfigurationManager.AppSettings["GitHub:ClientSecret"],
-                CallbackPath = new PathString("/signin-github"),
-                Scope = { "user:email" } // Add scope to the collection
-            });
+            // Configure GitHub authentication
+            var githubClientId = System.Configuration.ConfigurationManager.AppSettings["GitHub:ClientId"];
+            var githubClientSecret = System.Configuration.ConfigurationManager.AppSettings["GitHub:ClientSecret"];
 
-            // Configure Google Authentication
-            app.UseGoogleAuthentication(new GoogleOAuth2AuthenticationOptions
+            if (!string.IsNullOrEmpty(githubClientId) && !string.IsNullOrEmpty(githubClientSecret))
             {
-                ClientId = System.Configuration.ConfigurationManager.AppSettings["Google:ClientId"],
-                ClientSecret = System.Configuration.ConfigurationManager.AppSettings["Google:ClientSecret"]
-            });
+                app.UseGitHubAuthentication(new GitHubAuthenticationOptions
+                {
+                    ClientId = githubClientId,
+                    ClientSecret = githubClientSecret,
+                    CallbackPath = new PathString("/signin-github"),
+                    Scope = { "user:email" },
+                    BackchannelTimeout = TimeSpan.FromSeconds(60),
+                    Provider = new GitHubAuthenticationProvider
+                    {
+                        OnAuthenticated = async (context) =>
+                        {
+                            System.Diagnostics.Debug.WriteLine($"GitHub Auth: ID={context.Id}, UserName={context.UserName ?? "null"}, Email={context.Email ?? "null"}");
 
-            // Configure Facebook Authentication
-            app.UseFacebookAuthentication(new FacebookAuthenticationOptions
+                            // Add claims
+                            context.Identity.AddClaim(new System.Security.Claims.Claim("GitHubId", context.Id ?? "unknown"));
+                            context.Identity.AddClaim(new System.Security.Claims.Claim("GitHubUserName", context.UserName ?? "unknown"));
+
+                            if (!string.IsNullOrEmpty(context.Email))
+                            {
+                                context.Identity.AddClaim(new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Email, context.Email));
+                                context.Identity.AddClaim(new System.Security.Claims.Claim("GitHubEmail", context.Email));
+                                System.Diagnostics.Debug.WriteLine($"GitHub Email Added: {context.Email}");
+                            }
+                            else
+                            {
+                                System.Diagnostics.Debug.WriteLine("GitHub Email: Not provided");
+                                context.Identity.AddClaim(new System.Security.Claims.Claim("EmailRequired", "true"));
+                            }
+
+                            await Task.FromResult(0);
+                        },
+                        OnReturnEndpoint = (context) =>
+                        {
+                            System.Diagnostics.Debug.WriteLine("GitHub Return Endpoint Called");
+                            return Task.FromResult(0);
+                        }
+                    }
+                });
+            }
+
+            // Configure Google authentication
+            var googleClientId = System.Configuration.ConfigurationManager.AppSettings["Google:ClientId"];
+            var googleClientSecret = System.Configuration.ConfigurationManager.AppSettings["Google:ClientSecret"];
+
+            if (!string.IsNullOrEmpty(googleClientId) && !string.IsNullOrEmpty(googleClientSecret))
             {
-                AppId = System.Configuration.ConfigurationManager.AppSettings["Facebook:AppId"],
-                AppSecret = System.Configuration.ConfigurationManager.AppSettings["Facebook:AppSecret"]
-            });
+                app.UseGoogleAuthentication(new GoogleOAuth2AuthenticationOptions
+                {
+                    ClientId = googleClientId,
+                    ClientSecret = googleClientSecret,
+                    Scope = { "profile", "email" },
+                    CallbackPath = new PathString("/signin-google")
+                });
+            }
+
+            // Configure Facebook authentication
+            var facebookAppId = System.Configuration.ConfigurationManager.AppSettings["Facebook:AppId"];
+            var facebookAppSecret = System.Configuration.ConfigurationManager.AppSettings["Facebook:AppSecret"];
+
+            if (!string.IsNullOrEmpty(facebookAppId) && !string.IsNullOrEmpty(facebookAppSecret))
+            {
+                app.UseFacebookAuthentication(new FacebookAuthenticationOptions
+                {
+                    AppId = facebookAppId,
+                    AppSecret = facebookAppSecret,
+                    CallbackPath = new PathString("/signin-facebook"),
+                    Scope = { "public_profile", "email" },
+                    BackchannelTimeout = TimeSpan.FromSeconds(60),
+                    Provider = new FacebookAuthenticationProvider
+                    {
+                        OnAuthenticated = async (context) =>
+                        {
+                            System.Diagnostics.Debug.WriteLine($"Facebook Auth Success: {context.Name} ({context.Id})");
+
+                            // Add claims
+                            context.Identity.AddClaim(new System.Security.Claims.Claim("FacebookId", context.Id));
+                            context.Identity.AddClaim(new System.Security.Claims.Claim("FacebookName", context.Name ?? "Unknown"));
+
+                            if (!string.IsNullOrEmpty(context.Email))
+                            {
+                                context.Identity.AddClaim(new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Email, context.Email));
+                                context.Identity.AddClaim(new System.Security.Claims.Claim("FacebookEmail", context.Email));
+                                System.Diagnostics.Debug.WriteLine($"Facebook Email: {context.Email}");
+                            }
+                            else
+                            {
+                                System.Diagnostics.Debug.WriteLine("Facebook Email: Not provided");
+                                context.Identity.AddClaim(new System.Security.Claims.Claim("EmailRequired", "true"));
+                            }
+
+                            await Task.FromResult(0);
+                        },
+                        OnReturnEndpoint = (context) =>
+                        {
+                            System.Diagnostics.Debug.WriteLine("Facebook Return Endpoint Called");
+                            return Task.FromResult(0);
+                        }
+                    }
+                });
+            }
         }
     }
 }

@@ -248,9 +248,7 @@
     <Content Include="Content\Images\ATA.jpg" />
     <Content Include="Content\Images\BT.jpg" />
     <Content Include="Content\Images\Coast.jpg" />
-    <Content Include="Content\Images\Destinations\1738eabd-1b5b-4624-818a-7f28ef61f366.jpg" />
     <Content Include="Content\Images\Destinations\dc8ba476-d081-4909-ab55-14454db2660c.jpg" />
-    <Content Include="Content\Images\Destinations\e7386ecc-1319-492b-861a-45ae30ecda1b.jpg" />
     <Content Include="Content\Images\EH.jpg" />
     <Content Include="Content\Images\ETG.png" />
     <Content Include="Content\Images\food.jpeg" />
@@ -261,7 +259,7 @@
     <Content Include="Content\Images\tradition.jpg" />
     <Content Include="Content\Images\Village.jpg" />
     <Content Include="Content\PagedList.css" />
-    <Content Include="Dockerfile.txt" />
+    <None Include="Dockerfile" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />
@@ -345,6 +343,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="bin\app.publish\ PublishedApp\" />
     <Folder Include="Views\Route\" />
   </ItemGroup>
   <ItemGroup>

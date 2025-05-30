@@ -3,7 +3,6 @@
 @{
     ViewBag.Title = "Log in";
 }
-
 <h2>@ViewBag.Title</h2>
 <div class="row">
     <div class="col-md-6">
@@ -59,7 +58,44 @@
         </section>
     </div>
 </div>
-
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
+    <script>
+        // More comprehensive session clearing
+        function clearAllCookies() {
+            // Clear all cookies for this domain
+            document.cookie.split(';').forEach(function (cookie) {
+                var name = cookie.split('=')[0].trim();
+                // Clear for root path
+                document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/';
+                // Clear for current path
+                document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=' + window.location.pathname;
+                // Clear with domain specification
+                document.cookie = name + '=;expires=Thu, 01 Jan 1970 00:00:00 GMT;path=/;domain=' + window.location.hostname;
+            });
+
+            // Clear sessionStorage and localStorage
+            if (typeof (Storage) !== "undefined") {
+                sessionStorage.clear();
+                localStorage.clear();
+            }
+        }
+
+        // Clear cookies on page load (fresh navigation)
+        if (window.performance && window.performance.navigation.type === window.performance.navigation.TYPE_NAVIGATE) {
+            clearAllCookies();
+        }
+
+        // Also clear cookies when external login buttons are clicked
+        document.addEventListener('DOMContentLoaded', function () {
+            var externalLoginForm = document.getElementById('externalLoginForm');
+            if (externalLoginForm) {
+                externalLoginForm.addEventListener('submit', function (e) {
+                    console.log('External login form submitting with provider: ' + e.submitter.value);
+                    // Clear cookies before starting OAuth flow
+                    clearAllCookies();
+                });
+            }
+        });
+    </script>
 }
