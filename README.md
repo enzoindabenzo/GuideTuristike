@@ -119,7 +119,7 @@ docker run -p 8080:80 guide-turistike
 <details>
 <summary>🏠 <strong>Homepage & Navigation</strong></summary>
 
-![Homepage Animation](docs/screenshots/EnzoTravel.mp4)
+![Homepage Animation](docs/screenshots/EnzoTravel.png)
 *Dynamic homepage with smooth animations and intuitive navigation*
 
 </details>
