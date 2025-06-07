@@ -17,9 +17,6 @@ namespace DK1.Controllers
 
     public class RouteController : Controller
     {
-        private const string ApiKey = "5b3ce3597851110001cf6248ea7e18438103425abc6af91e582ca4dd";
-        private const string BaseUrl = "https://api.openrouteservice.org/v2/directions/driving-car";
-
         [HttpPost]
         public async Task<ActionResult> GetRoute()
         {
