@@ -1,8 +1,10 @@
-﻿@{
-    ViewBag.Title = "Login Failure";
+﻿@model dynamic
+@{
+    ViewBag.Title = "External Login Failure";
 }
-
-<hgroup>
-    <h2>@ViewBag.Title.</h2>
-    <h3 class="text-danger">Unsuccessful login with service.</h3>
-</hgroup>
+<h2>@ViewBag.Title</h2>
+<div>
+    <p>@ViewBag.ErrorMessage</p>
+    <p>Please try logging in again or contact support.</p>
+    @Html.ActionLink("Back to Login", "Login", "Account", null, new { @class = "btn btn-primary" })
+</div>

@@ -1,69 +1,98 @@
 ﻿@model DK1.Models.ExternalLoginListViewModel
 @using Microsoft.Owin.Security
 
-<h4>Use another service to log in.</h4>
-<hr />
+<style>
+    .social-login-container {
+        margin-top: 10px;
+    }
+
+    .btn-social {
+        display: inline-flex;
+        align-items: center;
+        margin-bottom: 10px;
+        background-color: #ffffff;
+        border: 1px solid #2e8b57;
+        color: #2e8b57;
+        padding: 8px 16px;
+        border-radius: 4px;
+        font-weight: 600;
+        transition: background-color 0.3s ease;
+    }
+
+        .btn-social:hover {
+            background-color: #2e8b57;
+            color: #ffffff;
+        }
+
+        .btn-social img {
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+        }
+
+    body.dark-mode .btn-social {
+        background-color: #1a1a1a;
+        border-color: #006400;
+        color: #c0ffc0;
+    }
+
+        body.dark-mode .btn-social:hover {
+            background-color: #006400;
+            color: white;
+        }
+</style>
+
 @{
     var loginProviders = Context.GetOwinContext().Authentication.GetExternalAuthenticationTypes();
-    if (!loginProviders.Any())
-    {
-        <div>
-            <p>
-                No external authentication services configured. See <a href="https://go.microsoft.com/fwlink/?LinkId=403804">this article</a>
-                for details on setting up this ASP.NET application to support logging in via external services.
-            </p>
-        </div>
-    }
-    else
-    {
-        using (Html.BeginForm("ExternalLogin", "Account", new { ReturnUrl = Model.ReturnUrl ?? "" }, FormMethod.Post, new { id = "externalLoginForm" }))
-        {
-            @Html.AntiForgeryToken()
-            <div id="socialLoginList">
-                <p>
-                    @foreach (AuthenticationDescription p in loginProviders)
-                    {
-                        string logoPath = "/Content/default-logo.png";
-                        string altText = $"{p.AuthenticationType} Login";
-                        string buttonText = p.AuthenticationType;
-
-                        switch (p.AuthenticationType.ToLower())
-                        {
-                            case "github":
-                                logoPath = "/Content/github-logo.png";
-                                altText = "GitHub Login";
-                                buttonText = "GitHub";
-                                break;
-                            case "google":
-                                logoPath = "/Content/google-logo.png";
-                                altText = "Google Login";
-                                buttonText = "Google";
-                                break;
-                            case "facebook":
-                                logoPath = "/Content/facebook-logo.png";
-                                altText = "Facebook Login";
-                                buttonText = "Facebook";
-                                break;
-                        }
-
-                        <button type="submit" class="btn btn-default" name="provider" value="@p.AuthenticationType"
-                                title="Log in using your @buttonText account" onclick="console.log('Submitting provider: @p.AuthenticationType')">
-                            @if (System.IO.File.Exists(Server.MapPath(logoPath)))
-                            {
-                                <img src="@logoPath" alt="@altText" style="width: 20px; height: 20px; vertical-align: middle; margin-right: 8px;" />
-                            }
-                            @buttonText
-                        </button>
-                        <br />
-                    }
-                </p>
-            </div>
-        }
-    }
 }
 
-<script>
-    document.getElementById('externalLoginForm').addEventListener('submit', function (e) {
-        console.log('Form submitting with provider: ' + e.submitter.value);
-    });
-</script>
+@if (!loginProviders.Any())
+{
+    <div>
+        <p>
+            Nuk ka shërbime të jashtme për login të konfiguruara.
+            <a href="https://go.microsoft.com/fwlink/?LinkId=403804" target="_blank">Mëso më shumë</a>
+        </p>
+    </div>
+}
+else
+{
+    using (Html.BeginForm("ExternalLogin", "Account", new { ReturnUrl = Model.ReturnUrl ?? "" }, FormMethod.Post, new { id = "externalLoginForm" }))
+    {
+        @Html.AntiForgeryToken()
+        <div class="social-login-container">
+            @foreach (AuthenticationDescription p in loginProviders)
+            {
+                string logoPath = "/Content/default.png";
+                string altText = $"{p.AuthenticationType} Login";
+                string buttonText = p.AuthenticationType;
+
+                switch (p.AuthenticationType.ToLower())
+                {
+                    case "openidconnect":
+                    case "microsoft":
+                        logoPath = "/Content/mss.png";
+                        altText = "Microsoft Login";
+                        buttonText = "Microsoft";
+                        break;
+                    case "google":
+                        logoPath = "/Content/images.jpg";
+                        altText = "Google Login";
+                        buttonText = "Google";
+                        break;
+                    case "facebook":
+                        logoPath = "/Content/fbb.png";
+                        altText = "Facebook Login";
+                        buttonText = "Facebook";
+                        break;
+                }
+
+                <button type="submit" class="btn-social" name="provider" value="@p.AuthenticationType"
+                        title="Hyr me llogarinë @buttonText" onclick="console.log('Submitting provider: @p.AuthenticationType')">
+                    <img src="@logoPath" alt="@altText" />
+                    @buttonText
+                </button><br />
+            }
+        </div>
+    }
+}

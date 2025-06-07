@@ -1,5 +1,4 @@
-﻿
-@model DK1.Models.Cal.ManageLocationsViewModel
+﻿@model DK1.Models.Cal.ManageLocationsViewModel
 @{
     ViewBag.Title = "Manage Locations";
 }
@@ -17,14 +16,14 @@
                     @Html.ValidationSummary(true, "", new { @class = "text-danger" })
 
                     <div class="form-group mb-3">
-                        @Html.LabelFor(m => m.NewLocation.Name)
-                        @Html.TextBoxFor(m => m.NewLocation.Name, new { @class = "form-control", required = "required" })
+                        @Html.LabelFor(m => m.NewLocation.Name, new { @for = "Name" })
+                        @Html.TextBoxFor(m => m.NewLocation.Name, new { @class = "form-control", id = "Name", required = "required" })
                         @Html.ValidationMessageFor(m => m.NewLocation.Name, "", new { @class = "text-danger" })
                     </div>
 
                     <div class="form-group mb-3">
-                        @Html.LabelFor(m => m.NewLocation.Region)
-                        @Html.TextBoxFor(m => m.NewLocation.Region, new { @class = "form-control", required = "required" })
+                        @Html.LabelFor(m => m.NewLocation.Region, new { @for = "Region" })
+                        @Html.TextBoxFor(m => m.NewLocation.Region, new { @class = "form-control", id = "Region", required = "required" })
                         @Html.ValidationMessageFor(m => m.NewLocation.Region, "", new { @class = "text-danger" })
                     </div>
 
@@ -36,14 +35,14 @@
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <div class="form-group">
-                                @Html.LabelFor(m => m.NewLocation.Latitude)
+                                @Html.LabelFor(m => m.NewLocation.Latitude, new { @for = "Latitude" })
                                 @Html.TextBoxFor(m => m.NewLocation.Latitude, new { @class = "form-control", type = "number", step = "0.000001", id = "Latitude", required = "required" })
                                 @Html.ValidationMessageFor(m => m.NewLocation.Latitude, "", new { @class = "text-danger" })
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                @Html.LabelFor(m => m.NewLocation.Longitude)
+                                @Html.LabelFor(m => m.NewLocation.Longitude, new { @for = "Longitude" })
                                 @Html.TextBoxFor(m => m.NewLocation.Longitude, new { @class = "form-control", type = "number", step = "0.000001", id = "Longitude", required = "required" })
                                 @Html.ValidationMessageFor(m => m.NewLocation.Longitude, "", new { @class = "text-danger" })
                             </div>
@@ -52,7 +51,7 @@
 
                     <div class="form-check mb-3">
                         @Html.CheckBoxFor(m => m.NewLocation.IsPopularDestination, new { @class = "form-check-input", id = "IsPopularDestination" })
-                        @Html.LabelFor(m => m.NewLocation.IsPopularDestination, new { @class = "form-check-label" })
+                        @Html.LabelFor(m => m.NewLocation.IsPopularDestination, new { @class = "form-check-label", @for = "IsPopularDestination" })
                     </div>
 
                     <div class="d-grid gap-2">
@@ -107,74 +106,370 @@
                 </div>
             </div>
         </div>
-
-        <div class="mt-3">
-            <a href="@Url.Action("Index", "TransportCalculator")" class="btn btn-outline-secondary">Back to Calculator</a>
-        </div>
     </div>
 </div>
 
+@@section Styles {
 <!-- Leaflet CSS -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" />
 
-<!-- Leaflet JS -->
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-@Scripts.Render("~/bundles/jqueryval")
-
-<script>
-    $(document).ready(function () {
-        // Initialize map for Albania
-        var map = L.map('map').setView([41.3275, 19.8187], 7);
-
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; OpenStreetMap contributors'
-        }).addTo(map);
-
-        var marker = L.marker([41.3275, 19.8187], { draggable: true }).addTo(map);
-
-        // Update coordinates when marker is moved
-        function updateCoordinates(latlng) {
-            $('#Latitude').val(latlng.lat.toFixed(6));
-            $('#Longitude').val(latlng.lng.toFixed(6));
+<style>
+        /* Modern gradient background */
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        // Initial coordinates
-        updateCoordinates(marker.getLatLng());
+        /* Enhanced container styling */
+        .row {
+            margin: 0;
+            padding: 20px;
+            gap: 20px;
+        }
 
-        marker.on('dragend', function (e) {
-            updateCoordinates(e.target.getLatLng());
-        });
+        /* Modern card design with glassmorphism effect */
+        .card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
 
-        map.on('click', function (e) {
-            marker.setLatLng(e.latlng);
-            updateCoordinates(e.latlng);
-        });
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+        }
 
-        // Form validation on submit
-        $('#addLocationForm').on('submit', function (e) {
-            let lat = parseFloat($('#Latitude').val());
-            let lng = parseFloat($('#Longitude').val());
+        /* Card headers with gradient */
+        .card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 20px;
+            border-radius: 20px 20px 0 0 !important;
+        }
 
-            if (isNaN(lat) || lat < 39 || lat > 43) {
-                alert("Latitude duhet të jetë midis 39° dhe 43° për Shqipërinë");
-                e.preventDefault();
-                return false;
+        .card-header h5 {
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            margin: 0;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-body {
+            padding: 30px;
+        }
+
+        /* Enhanced form controls */
+        .form-control {
+            border: 2px solid #e8ecf4;
+            border-radius: 12px;
+            padding: 12px 16px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+            background: white;
+            transform: translateY(-1px);
+        }
+
+        /* Enhanced labels */
+        label {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 8px;
+            font-size: 14px;
+            letter-spacing: 0.3px;
+        }
+
+        /* Map container styling */
+        #map {
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            border: 3px solid #e8ecf4;
+            transition: all 0.3s ease;
+        }
+
+        #map:hover {
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+            border-color: #667eea;
+        }
+
+        /* Enhanced buttons */
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 12px;
+            padding: 12px 30px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+            background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+        }
+
+        .btn-warning {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(251, 191, 36, 0.3);
+        }
+
+        .btn-warning:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(251, 191, 36, 0.4);
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: white;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(239, 68, 68, 0.4);
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+        }
+
+        /* Enhanced table styling */
+        .table {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            margin: 0;
+        }
+
+        .table thead th {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+            border: none;
+            font-weight: 600;
+            color: #2d3748;
+            padding: 15px;
+            letter-spacing: 0.3px;
+            font-size: 13px;
+            text-transform: uppercase;
+        }
+
+        .table tbody tr {
+            transition: all 0.3s ease;
+        }
+
+        .table tbody tr:hover {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            transform: scale(1.01);
+        }
+
+        .table tbody td {
+            padding: 15px;
+            vertical-align: middle;
+            border-color: #e8ecf4;
+        }
+
+        /* Enhanced badges */
+        .badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        .badge.bg-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+            box-shadow: 0 3px 10px rgba(16, 185, 129, 0.3);
+        }
+
+        .badge.bg-secondary {
+            background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%) !important;
+            box-shadow: 0 3px 10px rgba(107, 114, 128, 0.3);
+        }
+
+        /* Enhanced alert styling */
+        .alert-info {
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(37, 99, 235, 0.1) 100%);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            border-radius: 12px;
+            color: #1e40af;
+            padding: 15px;
+        }
+
+        .alert-info i {
+            color: #3b82f6;
+            margin-right: 8px;
+        }
+
+        /* Enhanced checkbox styling */
+        .form-check-input {
+            width: 20px;
+            height: 20px;
+            border-radius: 6px;
+            border: 2px solid #e8ecf4;
+            transition: all 0.3s ease;
+        }
+
+        .form-check-input:checked {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: #667eea;
+            box-shadow: 0 3px 10px rgba(102, 126, 234, 0.3);
+        }
+
+        .form-check-label {
+            margin-left: 8px;
+            font-weight: 500;
+        }
+
+        /* Validation message styling */
+        .text-danger {
+            font-size: 12px;
+            margin-top: 5px;
+            font-weight: 500;
+        }
+
+        /* Form group spacing */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        /* Responsive enhancements */
+        @@media (max-width: 768px) {
+            .card-body {
+                padding: 20px;
             }
 
-            if (isNaN(lng) || lng < 19 || lng > 21.5) {
-                alert("Longitude duhet të jetë midis 19° dhe 21.5° për Shqipërinë");
-                e.preventDefault();
-                return false;
+            .row {
+                padding: 10px;
             }
 
-            // If validation passes, form will be submitted normally
-        });
+            #map {
+                height: 250px !important;
+            }
+        }
 
-        // Make sure the map is properly rendered
-        setTimeout(function () {
-            map.invalidateSize();
-        }, 100);
-    });
-</script>
+        /* Loading animation for map */
+        #map::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+            animation: loading 1.5s infinite;
+            z-index: 1000;
+            pointer-events: none;
+        }
+
+        @@keyframes loading {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        /* Smooth transitions for all interactive elements */
+        * {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Custom scrollbar for table container */
+        .table-responsive::-webkit-scrollbar {
+            height: 8px;
+        }
+
+        .table-responsive::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 4px;
+        }
+
+        .table-responsive::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 4px;
+        }
+
+        .table-responsive::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+        }
+</style>
+}
+
+@section scripts {
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script>
+        $(document).ready(function () {
+            // Initialize map for Albania
+            var map = L.map('map').setView([41.3275, 19.8187], 7);
+
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+
+            var marker = L.marker([41.3275, 19.8187], { draggable: true }).addTo(map);
+
+            // Update coordinates when marker is moved
+            function updateCoordinates(latlng) {
+                $('#Latitude').val(latlng.lat.toFixed(6));
+                $('#Longitude').val(latlng.lng.toFixed(6));
+            }
+
+            // Initial coordinates
+            updateCoordinates(marker.getLatLng());
+
+            marker.on('dragend', function (e) {
+                updateCoordinates(e.target.getLatLng());
+            });
+
+            map.on('click', function (e) {
+                marker.setLatLng(e.latlng);
+                updateCoordinates(e.latlng);
+            });
+
+            // Form validation on submit
+            $('#addLocationForm').on('submit', function (e) {
+                let lat = parseFloat($('#Latitude').val());
+                let lng = parseFloat($('#Longitude').val());
+
+                if (isNaN(lat) || lat < 39 || lat > 43) {
+                    alert("Latitude duhet të jetë midis 39° dhe 43° për Shqipërinë");
+                    e.preventDefault();
+                    return false;
+                }
+
+                if (isNaN(lng) || lng < 19 || lng > 21.5) {
+                    alert("Longitude duhet të jetë midis 19° dhe 21.5° për Shqipërinë");
+                    e.preventDefault();
+                    return false;
+                }
+
+                // If validation passes, form will be submitted normally
+            });
+
+            // Make sure the map is properly rendered
+            setTimeout(function () {
+                map.invalidateSize();
+            }, 100);
+        });
+    </script>
+}

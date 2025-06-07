@@ -3,10 +3,27 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewBag.Title - My ASP.NET Application</title>
+    <title>@ViewBag.Title - Enzo Travel</title>
+
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
     @RenderSection("Styles", required: false)
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.css" />
+
+    <!-- Font Awesome (Optional - if used) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
+    <!-- Updated CSP Meta Tag to include PayPal domains -->
+    <meta http-equiv="Content-Security-Policy" content="
+        default-src 'self';
+        script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://connect.facebook.net https://cdnjs.cloudflare.com https://code.jquery.com https://unpkg.com https://*.paypal.com https://*.paypalobjects.com https://objects.paypal.cn;
+        style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://unpkg.com;
+        font-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;
+        img-src 'self' data: https://*.facebook.com https://*.google.com https://*.github.com https://*.tile.openstreetmap.org https://cdn.jsdelivr.net https://unpkg.com https://*.paypal.com https://*.paypalobjects.com;
+        connect-src 'self' https://www.facebook.com https://accounts.google.com https://api.github.com https://*.tile.openstreetmap.org https://*.paypal.com https://*.paypalobjects.com;
+    ">
 </head>
 <body>
     <div class="navbar navbar-inverse navbar-fixed-top">
@@ -78,12 +95,14 @@
         @RenderBody()
         <hr />
         <footer>
-            <p>&copy; @DateTime.Now.Year - Enzo Travel</p>
+            <p>© @DateTime.Now.Year - Enzo Travel</p>
         </footer>
     </div>
 
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
     @RenderSection("scripts", required: false)
+    <!-- Leaflet JS -->
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.4/dist/leaflet.js"></script>
 </body>
 </html>

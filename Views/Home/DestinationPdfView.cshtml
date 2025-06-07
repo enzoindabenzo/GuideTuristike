@@ -1,102 +1,302 @@
 ﻿@model DK1.Models.Destination
-
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
     <title>@Model.Name</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 40px;
-            background-color: #F5F5F5;
+            font-family: 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #2c3e50;
+            background-color: #ffffff;
+            font-size: 14px;
         }
 
-        .card {
-            background-color: #fff;
-            border: 1.5px solid #4F6F52;
-            border-radius: 12px;
-            padding: 25px 30px;
-            max-width: 700px;
+        .container {
+            max-width: 800px;
             margin: 0 auto;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+            padding: 30px;
         }
 
-            .card img {
-                width: 100%;
-                height: auto;
-                border-radius: 10px;
-                margin-bottom: 20px;
-                border: 1px solid #ddd;
-            }
+        /* Header Section */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 3px solid #8b5cf6;
+            padding-bottom: 20px;
+        }
 
-            .card h2 {
-                color: #3A4D39;
-                margin-bottom: 10px;
-                font-size: 26px;
-            }
-
-        .meta-info {
-            font-size: 16px;
-            color: #555;
+        .logo {
+            color: #8b5cf6;
+            font-size: 18px;
+            font-weight: 600;
             margin-bottom: 10px;
         }
 
-            .meta-info strong {
-                color: #4F6F52;
-                font-weight: 600;
-            }
-
-        .description {
-            margin-top: 20px;
-            font-size: 15.5px;
-            line-height: 1.6;
-            color: #333;
+        .destination-title {
+            font-size: 32px;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 5px;
+            letter-spacing: -0.5px;
         }
 
-        .footer {
-            margin-top: 30px;
-            font-size: 13px;
-            color: #aaa;
+        .subtitle {
+            color: #64748b;
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        /* Image Section */
+        .image-section {
+            margin-bottom: 30px;
             text-align: center;
+        }
+
+        .destination-image {
+            width: 100%;
+            max-width: 600px;
+            height: auto;
+            border-radius: 8px;
+            border: 2px solid #e2e8f0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Meta Information Grid */
+        .meta-section {
+            display: table;
+            width: 100%;
+            margin-bottom: 30px;
+            border-collapse: separate;
+            border-spacing: 15px;
+        }
+
+        .meta-row {
+            display: table-row;
+        }
+
+        .meta-item {
+            display: table-cell;
+            width: 50%;
+            background-color: #f8fafc;
+            border: 2px solid #8b5cf6;
+            border-radius: 8px;
+            padding: 20px;
+            vertical-align: top;
+        }
+
+        .meta-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #8b5cf6;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .meta-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1a202c;
+        }
+
+        /* Expense Section */
+        .expense-section {
+            background-color: #f1f5f9;
+            border: 2px solid #8b5cf6;
+            border-radius: 8px;
+            padding: 25px;
+            margin: 25px 0;
+            text-align: center;
+        }
+
+        .expense-label {
+            font-size: 14px;
+            font-weight: 700;
+            color: #8b5cf6;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .expense-amount {
+            font-size: 24px;
+            font-weight: 800;
+            color: #1a202c;
+            margin-bottom: 8px;
+        }
+
+        .expense-median {
+            font-size: 14px;
+            color: #64748b;
+            font-style: italic;
+        }
+
+        /* Description Section */
+        .description-section {
+            margin: 30px 0;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a202c;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .description-content {
+            font-size: 15px;
+            line-height: 1.7;
+            color: #374151;
+            text-align: justify;
+        }
+
+        .description-content p {
+            margin-bottom: 12px;
+        }
+
+        .description-content strong {
+            color: #1a202c;
+            font-weight: 600;
+        }
+
+        /* Footer */
+        .footer {
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #e2e8f0;
+            text-align: center;
+            color: #64748b;
+            font-size: 12px;
+        }
+
+        .footer-logo {
+            color: #8b5cf6;
+            font-weight: 600;
+        }
+
+        /* Print-specific styles */
+        @@media print {
+            body {
+                font-size: 12px;
+            }
+
+            .container {
+                padding: 20px;
+            }
+
+            .destination-title {
+                font-size: 28px;
+            }
+
+            .expense-amount {
+                font-size: 20px;
+            }
+
+            .section-title {
+                font-size: 18px;
+            }
+        }
+
+        /* Fallback for older PDF generators */
+        .meta-section-fallback {
+            display: none;
+        }
+
+        /* Show fallback if table display not supported */
+        @@supports not (display: table) {
+            .meta-section {
+                display: none;
+            }
+
+            .meta-section-fallback {
+                display: block;
+                margin-bottom: 30px;
+            }
+
+            .meta-item-fallback {
+                background-color: #f8fafc;
+                border: 2px solid #8b5cf6;
+                border-radius: 8px;
+                padding: 20px;
+                margin-bottom: 15px;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="card">
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">Guida Turistike Shqipëri</div>
+            <h1 class="destination-title">@Model.Name</h1>
+            <div class="subtitle">Destinacion Turistik</div>
+        </div>
+
+        <!-- Image Section -->
         @if (!string.IsNullOrEmpty(Model.ImagePath))
         {
-            <img src="@Url.Content(Model.ImagePath)" alt="@Model.Name" />
+            <div class="image-section">
+                <img src="@Url.Content(Model.ImagePath)" alt="@Model.Name" class="destination-image" />
+            </div>
         }
 
-        <h2>@Model.Name</h2>
-
-        <div class="meta-info">
-            <p><strong>Rajoni:</strong> @Model.Region</p>
-            <p><strong>Kategoria:</strong> @(Model.Category?.Name ?? "Pa kategori")</p>
+        <!-- Meta Information -->
+        <div class="meta-section">
+            <div class="meta-row">
+                <div class="meta-item">
+                    <div class="meta-label">Rajoni</div>
+                    <div class="meta-value">@Model.Region</div>
+                </div>
+                <div class="meta-item">
+                    <div class="meta-label">Kategoria</div>
+                    <div class="meta-value">@(Model.Category?.Name ?? "Pa kategori")</div>
+                </div>
+            </div>
         </div>
 
-        <div class="meta-info">
-            <p><strong>Rajoni:</strong> @Model.Region</p>
-            <p><strong>Kategoria:</strong> @(Model.Category?.Name ?? "Pa kategori")</p>
-
-            @if (Model.MinDailyExpenseAL.HasValue || Model.MaxDailyExpenseAL.HasValue)
-            {
-                <p>
-                    <strong>Buxheti Ditor</strong><br />
-                    @Model.DailyExpenseRange <br />
-                    <strong>Mesatarja:</strong> @Model.MedianDailyExpenseAL ALL
-                </p>
-            }
+        <!-- Fallback for older PDF generators -->
+        <div class="meta-section-fallback">
+            <div class="meta-item-fallback">
+                <div class="meta-label">Rajoni</div>
+                <div class="meta-value">@Model.Region</div>
+            </div>
+            <div class="meta-item-fallback">
+                <div class="meta-label">Kategoria</div>
+                <div class="meta-value">@(Model.Category?.Name ?? "Pa kategori")</div>
+            </div>
         </div>
 
+        <!-- Expense Information -->
+        @if (Model.MinDailyExpenseAL.HasValue || Model.MaxDailyExpenseAL.HasValue)
+        {
+            <div class="expense-section">
+                <div class="expense-label">Buxheti Ditor</div>
+                <div class="expense-amount">@Model.DailyExpenseRange</div>
+                <div class="expense-median">Mesatarja: @Model.MedianDailyExpenseAL ALL</div>
+            </div>
+        }
 
-        <div class="description">
-            @Html.Raw(Model.Description)
+        <!-- Description -->
+        <div class="description-section">
+            <h2 class="section-title">Përshkrimi</h2>
+            <div class="description-content">
+                @Html.Raw(Model.Description)
+            </div>
         </div>
 
+        <!-- Footer -->
         <div class="footer">
-            Gjeneruar nga Guida Turistike Shqipëri &copy; @DateTime.Now.Year
+            Gjeneruar nga <span class="footer-logo">Guida Turistike Shqipëri</span> &copy; @DateTime.Now.Year
         </div>
     </div>
 </body>

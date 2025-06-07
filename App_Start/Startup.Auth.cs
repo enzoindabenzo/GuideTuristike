@@ -7,14 +7,22 @@ using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.Google;
 using Microsoft.Owin.Security.Facebook;
+using Microsoft.Owin.Security.OpenIdConnect;
 using Owin;
-using Owin.Security.Providers.GitHub;
 using DK1.Models;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
+
+[assembly: OwinStartup(typeof(DK1.Startup))]
 
 namespace DK1
 {
     public partial class Startup
     {
+        public void Configuration(IAppBuilder app)
+        {
+            ConfigureAuth(app);
+        }
+
         public void ConfigureAuth(IAppBuilder app)
         {
             // Configure the db context, user manager, and sign-in manager
@@ -22,133 +30,192 @@ namespace DK1
             app.CreatePerOwinContext<ApplicationUserManager>(ApplicationUserManager.Create);
             app.CreatePerOwinContext<ApplicationSignInManager>(ApplicationSignInManager.Create);
 
-            // Enable cookie authentication
+            // IMPORTANT: Order matters! Set up cookie authentication FIRST
             app.UseCookieAuthentication(new CookieAuthenticationOptions
             {
                 AuthenticationType = DefaultAuthenticationTypes.ApplicationCookie,
                 LoginPath = new PathString("/Account/Login"),
-                ExpireTimeSpan = TimeSpan.FromMinutes(60), // Set explicit expiration
+                ExpireTimeSpan = TimeSpan.FromMinutes(60),
                 SlidingExpiration = true,
+                CookieName = "YourAppAuth", // Give it a specific name
+                CookieSecure = CookieSecureOption.SameAsRequest,
                 Provider = new CookieAuthenticationProvider
                 {
                     OnValidateIdentity = SecurityStampValidator.OnValidateIdentity<ApplicationUserManager, ApplicationUser>(
                         validateInterval: TimeSpan.FromMinutes(30),
                         regenerateIdentity: (manager, user) => user.GenerateUserIdentityAsync(manager))
-                },
-                CookieManager = new Microsoft.Owin.Host.SystemWeb.SystemWebCookieManager()
+                }
             });
 
+            // External sign-in cookie
             app.UseExternalSignInCookie(DefaultAuthenticationTypes.ExternalCookie);
 
-            // Configure two-factor authentication cookies
+            // Two-factor authentication cookies
             app.UseTwoFactorSignInCookie(DefaultAuthenticationTypes.TwoFactorCookie, TimeSpan.FromMinutes(5));
             app.UseTwoFactorRememberBrowserCookie(DefaultAuthenticationTypes.TwoFactorRememberBrowserCookie);
 
-            // Configure GitHub authentication
-            var githubClientId = System.Configuration.ConfigurationManager.AppSettings["GitHub:ClientId"];
-            var githubClientSecret = System.Configuration.ConfigurationManager.AppSettings["GitHub:ClientSecret"];
+            // Configure external providers
+            ConfigureAzureADAuthentication(app);
+            ConfigureGoogleAuthentication(app);
+            ConfigureFacebookAuthentication(app);
+        }
 
-            if (!string.IsNullOrEmpty(githubClientId) && !string.IsNullOrEmpty(githubClientSecret))
+        private void ConfigureAzureADAuthentication(IAppBuilder app)
+        {
+            try
             {
-                app.UseGitHubAuthentication(new GitHubAuthenticationOptions
+                var clientId = System.Configuration.ConfigurationManager.AppSettings["Azure:ClientId"];
+                var clientSecret = System.Configuration.ConfigurationManager.AppSettings["Azure:ClientSecret"];
+                var authority = System.Configuration.ConfigurationManager.AppSettings["Azure:Authority"];
+
+                System.Diagnostics.Debug.WriteLine($"Azure AD Config - ClientId: {clientId ?? "NULL"}");
+                System.Diagnostics.Debug.WriteLine($"Azure AD Config - Authority: {authority ?? "NULL"}");
+
+                if (!string.IsNullOrEmpty(clientId) && !string.IsNullOrEmpty(clientSecret) && !string.IsNullOrEmpty(authority))
                 {
-                    ClientId = githubClientId,
-                    ClientSecret = githubClientSecret,
-                    CallbackPath = new PathString("/signin-github"),
-                    Scope = { "user:email" },
-                    BackchannelTimeout = TimeSpan.FromSeconds(60),
-                    Provider = new GitHubAuthenticationProvider
+                    app.UseOpenIdConnectAuthentication(new OpenIdConnectAuthenticationOptions
                     {
-                        OnAuthenticated = async (context) =>
+                        ClientId = clientId,
+                        ClientSecret = clientSecret,
+                        Authority = authority,
+                        PostLogoutRedirectUri = "https://localhost:44352/",
+                        ResponseType = OpenIdConnectResponseType.CodeIdToken,
+                        Scope = OpenIdConnectScope.OpenIdProfile + " email",
+                        TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
                         {
-                            System.Diagnostics.Debug.WriteLine($"GitHub Auth: ID={context.Id}, UserName={context.UserName ?? "null"}, Email={context.Email ?? "null"}");
-
-                            // Add claims
-                            context.Identity.AddClaim(new System.Security.Claims.Claim("GitHubId", context.Id ?? "unknown"));
-                            context.Identity.AddClaim(new System.Security.Claims.Claim("GitHubUserName", context.UserName ?? "unknown"));
-
-                            if (!string.IsNullOrEmpty(context.Email))
-                            {
-                                context.Identity.AddClaim(new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Email, context.Email));
-                                context.Identity.AddClaim(new System.Security.Claims.Claim("GitHubEmail", context.Email));
-                                System.Diagnostics.Debug.WriteLine($"GitHub Email Added: {context.Email}");
-                            }
-                            else
-                            {
-                                System.Diagnostics.Debug.WriteLine("GitHub Email: Not provided");
-                                context.Identity.AddClaim(new System.Security.Claims.Claim("EmailRequired", "true"));
-                            }
-
-                            await Task.FromResult(0);
+                            ValidateIssuer = false, // Set to false for multi-tenant
+                            NameClaimType = "name"
                         },
-                        OnReturnEndpoint = (context) =>
+                        Notifications = new OpenIdConnectAuthenticationNotifications
                         {
-                            System.Diagnostics.Debug.WriteLine("GitHub Return Endpoint Called");
-                            return Task.FromResult(0);
+                            AuthenticationFailed = context =>
+                            {
+                                System.Diagnostics.Debug.WriteLine($"Azure AD Auth Failed: {context.Exception?.Message}");
+                                context.OwinContext.Response.Redirect("/Account/Login?error=azure_failed");
+                                context.HandleResponse();
+                                return Task.FromResult(0);
+                            },
+                            AuthorizationCodeReceived = context =>
+                            {
+                                System.Diagnostics.Debug.WriteLine("Azure AD: Authorization code received");
+                                return Task.FromResult(0);
+                            },
+                            SecurityTokenValidated = context =>
+                            {
+                                try
+                                {
+                                    System.Diagnostics.Debug.WriteLine("Azure AD: Token validated");
+                                    var identity = context.AuthenticationTicket.Identity;
+                                    if (identity != null)
+                                    {
+                                        // Get claims from the token
+                                        var email = identity.FindFirst("preferred_username")?.Value ??
+                                                   identity.FindFirst("email")?.Value ??
+                                                   identity.FindFirst("upn")?.Value;
+                                        var name = identity.FindFirst("name")?.Value;
+                                        var objectId = identity.FindFirst("oid")?.Value ??
+                                                     identity.FindFirst("http://schemas.microsoft.com/identity/claims/objectidentifier")?.Value;
+
+                                        System.Diagnostics.Debug.WriteLine($"Azure AD Claims - Email: {email ?? "null"}, Name: {name ?? "null"}, ObjectId: {objectId ?? "null"}");
+
+                                        // Add custom claims
+                                        if (!string.IsNullOrEmpty(email))
+                                        {
+                                            identity.AddClaim(new System.Security.Claims.Claim("AzureEmail", email));
+                                            identity.AddClaim(new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Email, email));
+                                        }
+                                        if (!string.IsNullOrEmpty(name))
+                                        {
+                                            identity.AddClaim(new System.Security.Claims.Claim("AzureName", name));
+                                        }
+                                        if (!string.IsNullOrEmpty(objectId))
+                                        {
+                                            identity.AddClaim(new System.Security.Claims.Claim("AzureObjectId", objectId));
+                                        }
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    System.Diagnostics.Debug.WriteLine($"Azure AD SecurityTokenValidated Error: {ex.Message}");
+                                }
+                                return Task.FromResult(0);
+                            }
                         }
-                    }
-                });
-            }
+                    });
 
-            // Configure Google authentication
-            var googleClientId = System.Configuration.ConfigurationManager.AppSettings["Google:ClientId"];
-            var googleClientSecret = System.Configuration.ConfigurationManager.AppSettings["Google:ClientSecret"];
-
-            if (!string.IsNullOrEmpty(googleClientId) && !string.IsNullOrEmpty(googleClientSecret))
-            {
-                app.UseGoogleAuthentication(new GoogleOAuth2AuthenticationOptions
+                    System.Diagnostics.Debug.WriteLine("Azure AD authentication configured successfully");
+                }
+                else
                 {
-                    ClientId = googleClientId,
-                    ClientSecret = googleClientSecret,
-                    Scope = { "profile", "email" },
-                    CallbackPath = new PathString("/signin-google")
-                });
+                    System.Diagnostics.Debug.WriteLine("Azure AD configuration incomplete");
+                }
             }
-
-            // Configure Facebook authentication
-            var facebookAppId = System.Configuration.ConfigurationManager.AppSettings["Facebook:AppId"];
-            var facebookAppSecret = System.Configuration.ConfigurationManager.AppSettings["Facebook:AppSecret"];
-
-            if (!string.IsNullOrEmpty(facebookAppId) && !string.IsNullOrEmpty(facebookAppSecret))
+            catch (Exception ex)
             {
-                app.UseFacebookAuthentication(new FacebookAuthenticationOptions
+                System.Diagnostics.Debug.WriteLine($"Azure AD setup error: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"Stack trace: {ex.StackTrace}");
+            }
+        }
+
+        private void ConfigureGoogleAuthentication(IAppBuilder app)
+        {
+            try
+            {
+                var clientId = System.Configuration.ConfigurationManager.AppSettings["Google:ClientId"];
+                var clientSecret = System.Configuration.ConfigurationManager.AppSettings["Google:ClientSecret"];
+
+                if (!string.IsNullOrEmpty(clientId) && !string.IsNullOrEmpty(clientSecret))
                 {
-                    AppId = facebookAppId,
-                    AppSecret = facebookAppSecret,
-                    CallbackPath = new PathString("/signin-facebook"),
-                    Scope = { "public_profile", "email" },
-                    BackchannelTimeout = TimeSpan.FromSeconds(60),
-                    Provider = new FacebookAuthenticationProvider
+                    app.UseGoogleAuthentication(new GoogleOAuth2AuthenticationOptions
                     {
-                        OnAuthenticated = async (context) =>
+                        ClientId = clientId,
+                        ClientSecret = clientSecret,
+                        Scope = { "profile", "email" }
+                    });
+
+                    System.Diagnostics.Debug.WriteLine("Google authentication configured");
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Google auth error: {ex.Message}");
+            }
+        }
+
+        private void ConfigureFacebookAuthentication(IAppBuilder app)
+        {
+            try
+            {
+                var appId = System.Configuration.ConfigurationManager.AppSettings["Facebook:AppId"];
+                var appSecret = System.Configuration.ConfigurationManager.AppSettings["Facebook:AppSecret"];
+
+                if (!string.IsNullOrEmpty(appId) && !string.IsNullOrEmpty(appSecret))
+                {
+                    app.UseFacebookAuthentication(new FacebookAuthenticationOptions
+                    {
+                        AppId = appId,
+                        AppSecret = appSecret,
+                        Scope = { "public_profile", "email" },
+                        Provider = new FacebookAuthenticationProvider
                         {
-                            System.Diagnostics.Debug.WriteLine($"Facebook Auth Success: {context.Name} ({context.Id})");
-
-                            // Add claims
-                            context.Identity.AddClaim(new System.Security.Claims.Claim("FacebookId", context.Id));
-                            context.Identity.AddClaim(new System.Security.Claims.Claim("FacebookName", context.Name ?? "Unknown"));
-
-                            if (!string.IsNullOrEmpty(context.Email))
+                            OnAuthenticated = async context =>
                             {
-                                context.Identity.AddClaim(new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Email, context.Email));
-                                context.Identity.AddClaim(new System.Security.Claims.Claim("FacebookEmail", context.Email));
-                                System.Diagnostics.Debug.WriteLine($"Facebook Email: {context.Email}");
+                                if (context.Identity != null && !string.IsNullOrEmpty(context.Email))
+                                {
+                                    context.Identity.AddClaim(new System.Security.Claims.Claim("FacebookEmail", context.Email));
+                                    context.Identity.AddClaim(new System.Security.Claims.Claim(System.Security.Claims.ClaimTypes.Email, context.Email));
+                                }
+                                await Task.FromResult(0);
                             }
-                            else
-                            {
-                                System.Diagnostics.Debug.WriteLine("Facebook Email: Not provided");
-                                context.Identity.AddClaim(new System.Security.Claims.Claim("EmailRequired", "true"));
-                            }
-
-                            await Task.FromResult(0);
-                        },
-                        OnReturnEndpoint = (context) =>
-                        {
-                            System.Diagnostics.Debug.WriteLine("Facebook Return Endpoint Called");
-                            return Task.FromResult(0);
                         }
-                    }
-                });
+                    });
+
+                    System.Diagnostics.Debug.WriteLine("Facebook authentication configured");
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Facebook auth error: {ex.Message}");
             }
         }
     }

@@ -4,11 +4,7 @@ using Owin;
 [assembly: OwinStartupAttribute(typeof(DK1.Startup))]
 namespace DK1
 {
-    public partial class Startup
-    {
-        public void Configuration(IAppBuilder app)
+        public partial class Startup
         {
-            ConfigureAuth(app);
         }
     }
-}

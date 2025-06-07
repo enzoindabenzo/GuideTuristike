@@ -8,166 +8,728 @@
 <link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
 
 <style>
-    .form-container {
-        background-color: #ffffff;
-        border-radius: 12px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-        padding: 2.5rem;
-        margin: 2rem auto;
-        max-width: 1200px;
-    }
+:root {
+  --primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --primary-hover: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%);
+  --success: #10b981;
+  --success-hover: #059669;
+  --warning: #f59e0b;
+  --warning-hover: #d97706;
+  --danger: #ef4444;
+  --danger-hover: #dc2626;
+  --info: #3b82f6;
+  --info-hover: #2563eb;
+  --surface: rgba(255, 255, 255, 0.95);
+  --surface-elevated: rgba(255, 255, 255, 0.98);
+  --text-primary: #2d3748;
+  --text-secondary: #6b7280;
+  --border: #e5e7eb;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  --backdrop: rgba(255, 255, 255, 0.95);
+  --navbar-height: 80px; /* Adjust this based on your navbar height */
+}
 
-    .form-header {
-        color: #2c3e50;
-        border-bottom: 2px solid #eaeaea;
-        padding-bottom: 1.5rem;
-        margin-bottom: 2.5rem;
-    }
+body {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background-attachment: fixed;
+  min-height: 100vh;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  padding: 20px;
+  padding-top: calc(var(--navbar-height) + 20px); /* Add space for navbar */
+}
 
-    .form-label {
-        font-weight: 600;
-        color: #34495e;
-        margin-bottom: 0.75rem;
-        font-size: 1rem;
-    }
+/* Main container for side-by-side layout */
+.main-container {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+  min-height: calc(100vh - var(--navbar-height) - 40px);
+}
 
-    .form-control-custom {
-        border: 1px solid #e0e0e0;
-        border-radius: 8px;
-        padding: 12px 16px;
-        transition: all 0.3s ease;
-        font-size: 0.95rem;
-    }
+/* Form container - left side */
+.form-container {
+  background: var(--surface);
+  backdrop-filter: blur(20px);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: var(--shadow-xl);
+  padding: 0;
+  overflow: hidden;
+  position: relative;
+  height: fit-content;
+  animation: slideInUp 0.6s ease-out;
+}
 
-        .form-control-custom:focus {
-            border-color: #3498db;
-            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
-            outline: none;
-        }
+/* Card header styling */
+.card-header, .form-header {
+  background: var(--primary);
+  color: white;
+  padding: 20px 24px;
+  margin: 0;
+  border-radius: 16px 16px 0 0;
+  border: none;
+  position: relative;
+  overflow: hidden;
+}
 
-    .btn-submit {
-        background-color: #3498db;
-        border: none;
-        border-radius: 8px;
-        padding: 12px 24px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        color: white;
-        font-size: 0.95rem;
-    }
+.card-header::before, .form-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, transparent 50%);
+  pointer-events: none;
+}
 
-        .btn-submit:hover {
-            background-color: #2980b9;
-            transform: translateY(-2px);
-        }
+.card-header h5, .form-header h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: white;
+  background: none;
+  -webkit-text-fill-color: white;
+  position: relative;
+  z-index: 1;
+}
 
-    .btn-create {
-        background-color: #2ecc71;
-        border: none;
-        border-radius: 8px;
-        padding: 12px 24px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        color: white;
-        font-size: 0.95rem;
-    }
+.form-header p {
+  display: none;
+}
 
-        .btn-create:hover {
-            background-color: #27ae60;
-            transform: translateY(-2px);
-        }
+/* Form body */
+.form-body, .card-body {
+  padding: 24px;
+}
 
-    .table th, .table td {
-        vertical-align: middle;
-        font-size: 0.95rem;
-    }
+/* Form labels */
+.form-label, label {
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+  font-size: 14px;
+  display: block;
+}
 
-    .table th {
-        background-color: #f8f9fa;
-        font-weight: 600;
-        color: #34495e;
-        padding: 15px;
-    }
+/* Form controls */
+.form-control-custom, .form-control {
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-size: 14px;
+  background: white;
+  transition: all 0.3s ease;
+  width: 100%;
+  box-sizing: border-box;
+  color: var(--text-primary);
+  font-weight: 500;
+}
 
-    .table td {
-        padding: 15px;
-    }
+.form-control-custom:focus, .form-control:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.15);
+  outline: none;
+  transform: translateY(-1px);
+}
 
-    .action-links a {
-        margin-right: 12px;
-        font-size: 0.9rem;
-        transition: color 0.2s ease;
-    }
+.form-control-custom::placeholder, .form-control::placeholder {
+  color: #9ca3af;
+  font-weight: 400;
+}
 
-        .action-links a:hover {
-            text-decoration: underline;
-        }
+/* Form groups */
+.form-group {
+  margin-bottom: 24px;
+}
 
-    .filter-group {
-        display: flex;
-        gap: 2rem; /* Increased gap between filter elements */
-        align-items: flex-end;
-        flex-wrap: wrap;
-    }
+/* Map container */
+#map {
+  border-radius: 12px;
+  border: 2px solid var(--border);
+  height: 300px;
+  width: 100%;
+  box-shadow: var(--shadow-md);
+}
 
-    .filter-item {
+/* Table container - right side */
+.table-container {
+  background: var(--surface);
+  backdrop-filter: blur(20px);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: var(--shadow-xl);
+  padding: 0;
+  overflow: hidden;
+  height: calc(100vh - var(--navbar-height) - 40px);
+  display: flex;
+  flex-direction: column;
+  animation: slideInUp 0.6s ease-out 0.2s both;
+}
+
+/* Table header matching the form header */
+.table-header {
+  background: var(--primary);
+  color: white;
+  padding: 20px 24px;
+  margin: 0;
+  border-radius: 16px 16px 0 0;
+  border: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.table-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.table-header h5 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: white;
+  position: relative;
+  z-index: 1;
+}
+
+/* Filter group - Fixed height and better spacing */
+.filter-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 16px;
+  align-items: end;
+  padding: 24px;
+  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  border-bottom: 2px solid var(--border);
+  min-height: 120px; /* Fixed height to prevent layout shift */
+  box-sizing: border-box;
+}
+
+.filter-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.filter-item label {
+  font-weight: 600;
+  color: var(--text-primary);
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 0;
+}
+
+.filter-item select.form-control-custom,
+.filter-item input.form-control-custom {
+  appearance: none;
+  background: white;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-primary);
+  transition: all 0.3s ease;
+  min-height: 44px; /* Ensure consistent height */
+  box-sizing: border-box;
+}
+
+.filter-item select.form-control-custom {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23667eea' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 12px center;
+  background-repeat: no-repeat;
+  background-size: 16px 12px;
+  padding-right: 40px;
+}
+
+.filter-item .form-control-custom:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+  outline: none;
+}
+
+/* Table wrapper - Remove extra spacing */
+.table-wrapper {
+  flex: 1;
+  overflow: auto;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+    /* Table styling - Enhanced */
+    .table {
+        width: 100%;
+        margin: 0;
+        font-size: 14px;
+        border-collapse: collapse;
         flex: 1;
-        min-width: 200px;
-        max-width: 300px;
     }
 
-    .alert {
-        border-radius: 8px;
-        font-size: 0.95rem;
-    }
-
-    .pagination {
-        margin-top: 2rem;
-    }
-
-        .pagination .page-link {
-            border-radius: 6px;
-            margin: 0 4px;
-            color: #3498db;
-            transition: all 0.3s ease;
+        .table th {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            font-weight: 700;
+            color: var(--text-primary);
+            padding: 18px 16px;
+            border-bottom: 2px solid var(--border);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            text-align: left;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
 
-            .pagination .page-link:hover {
-                background-color: #3498db;
-                color: white;
+        .table td {
+            padding: 18px 16px;
+            border-bottom: 1px solid #f3f4f6;
+            color: var(--text-primary);
+            font-weight: 500;
+            vertical-align: middle;
+            transition: background-color 0.2s ease;
+        }
+
+        .table tbody tr {
+            transition: all 0.2s ease;
+        }
+
+            .table tbody tr:nth-child(even) {
+                background: rgba(248, 250, 252, 0.5);
             }
 
-        .pagination .active .page-link {
-            background-color: #3498db;
-            border-color: #3498db;
-            color: white;
-        }
+/* Action buttons - Enhanced */
+.action-links {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.action-links a, .btn {
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  position: relative;
+  overflow: hidden;
+}
+
+.action-links a::before, .btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition: left 0.5s;
+}
+
+.action-links a:hover::before, .btn:hover::before {
+  left: 100%;
+}
+
+/* Button colors - Enhanced */
+.btn-success, .text-success {
+  background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+.btn-success:hover, .text-success:hover {
+  background: linear-gradient(135deg, var(--success-hover) 0%, #047857 100%);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+}
+
+.btn-warning, .text-warning {
+  background: linear-gradient(135deg, var(--warning) 0%, #d97706 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+}
+
+.btn-warning:hover, .text-warning:hover {
+  background: linear-gradient(135deg, var(--warning-hover) 0%, #b45309 100%);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(245, 158, 11, 0.4);
+}
+
+.btn-danger, .text-danger {
+  background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+}
+
+.btn-danger:hover, .text-danger:hover {
+  background: linear-gradient(135deg, var(--danger-hover) 0%, #b91c1c 100%);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(239, 68, 68, 0.4);
+}
+
+.btn-info, .text-info {
+  background: linear-gradient(135deg, var(--info) 0%, #2563eb 100%);
+  color: white;
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.btn-info:hover, .text-info:hover {
+  background: linear-gradient(135deg, var(--info-hover) 0%, #1d4ed8 100%);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+}
+
+/* Primary buttons */
+.btn-submit, .btn-primary {
+  background: var(--primary);
+  color: white;
+  padding: 14px 28px;
+  border-radius: 10px;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  transition: all 0.3s ease;
+}
+
+.btn-submit:hover, .btn-primary:hover {
+  background: var(--primary-hover);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+}
+
+.btn-create {
+  background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+  color: white;
+  padding: 14px 28px;
+  border-radius: 10px;
+  font-weight: 600;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  transition: all 0.3s ease;
+}
+
+.btn-create:hover {
+  background: linear-gradient(135deg, var(--success-hover) 0%, #047857 100%);
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+}
+
+/* Status badges - Enhanced */
+.badge {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.badge.bg-success {
+  background: linear-gradient(135deg, var(--success) 0%, #059669 100%) !important;
+  color: white;
+}
+
+.badge.bg-secondary {
+  background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%) !important;
+  color: white;
+}
+
+/* Popular status indicators */
+.popular-yes {
+  background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+  color: white;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+}
+
+.popular-no {
+  background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+  color: white;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 8px rgba(107, 114, 128, 0.3);
+}
+
+/* Alerts - Enhanced */
+.alert {
+  border-radius: 12px;
+  padding: 16px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  margin: 16px 0;
+  border: 2px solid;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.alert-success {
+  background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+  color: #166534;
+  border-color: #bbf7d0;
+}
+
+.alert-warning {
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+  color: #92400e;
+  border-color: #fde68a;
+}
+
+.alert-info {
+  background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+  color: #1e40af;
+  border-color: #bfdbfe;
+}
+
+/* Pagination - No extra spacing */
+.pagination {
+  margin: 0;
+  padding: 20px 24px;
+  text-align: center;
+  border-top: 2px solid var(--border);
+  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  border-radius: 0 0 16px 16px;
+}
+
+.pagination .page-link {
+  border-radius: 8px;
+  margin: 0 4px;
+  padding: 10px 16px;
+  color: var(--text-primary);
+  background: white;
+  border: 2px solid var(--border);
+  transition: all 0.3s ease;
+  font-weight: 600;
+  text-decoration: none;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.pagination .page-link:hover {
+  background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+  border-color: #9ca3af;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.pagination .active .page-link {
+  background: var(--primary);
+  border-color: transparent;
+  color: white;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+/* Create button container */
+.create-button-container {
+  margin: 24px 0;
+  text-align: center;
+}
+
+/* Table images - Enhanced */
+.table img {
+  border-radius: 8px;
+  object-fit: cover;
+  height: 50px;
+  width: 70px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease;
+}
+
+.table img:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Enhanced animations */
+@@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Enhanced scrollbar styling */
+.table-wrapper::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.table-wrapper::-webkit-scrollbar-track {
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
+  border-radius: 4px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #cbd5e1 0%, #94a3b8 100%);
+  border-radius: 4px;
+  border: 1px solid #e2e8f0;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%);
+}
+
+/* Responsive design - Enhanced */
+@@media (max-width: 1200px) {
+  .main-container {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    min-height: auto;
+  }
+
+  .table-container {
+    height: 70vh;
+    min-height: 600px;
+  }
+
+  .filter-group {
+    grid-template-columns: 1fr 1fr;
+    min-height: 140px;
+  }
+
+  .filter-group .filter-item:last-child {
+    grid-column: 1 / -1;
+    justify-self: center;
+    width: 200px;
+  }
+}
+
+@@media (max-width: 768px) {
+  body {
+    padding: 10px;
+    padding-top: calc(var(--navbar-height) + 10px);
+  }
+
+  .main-container {
+    gap: 15px;
+  }
+
+  .form-body, .card-body {
+    padding: 20px;
+  }
+
+  .card-header, .form-header, .table-header {
+    padding: 16px 20px;
+  }
+
+  .filter-group {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    padding: 20px;
+    min-height: 200px;
+  }
+
+  .filter-item .form-control-custom {
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+
+  .table th, .table td {
+    padding: 12px 10px;
+    font-size: 13px;
+  }
+
+  .action-links {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .action-links a {
+    width: 100%;
+    justify-content: center;
+    padding: 10px 16px;
+  }
+
+  .table-container {
+    height: 60vh;
+    min-height: 500px;
+  }
+}
+
+@@media (max-width: 480px) {
+  .table th, .table td {
+    padding: 8px 6px;
+    font-size: 12px;
+  }
+
+  .filter-group {
+    padding: 16px;
+    min-height: 220px;
+  }
+
+  .pagination {
+    padding: 16px;
+  }
+
+  .pagination .page-link {
+    padding: 8px 12px;
+    margin: 0 2px;
+    font-size: 12px;
+  }
+}
 </style>
 
-<div class="container">
+<div class="container-fluid">
     <div class="form-container">
         <div class="form-header">
-            <h2 class="mb-0">Destinacionet Turistike</h2>
-            <p class="text-muted mt-2">Shfletoni dhe menaxhoni destinacionet turistike</p>
+            <h2>Destinacionet Turistike</h2>
+            <p>Shfletoni dhe menaxhoni destinacionet turistike me stil</p>
         </div>
 
         @if (TempData["SuccessMessage"] != null)
         {
             <div class="alert alert-success">
-                @TempData["SuccessMessage"]
+                ✅ @TempData["SuccessMessage"]
             </div>
         }
 
         @using (Html.BeginForm("Index", "Destinations", FormMethod.Get))
         {
-            <div class="filter-group mb-4">
+            <div class="filter-group">
                 <div class="filter-item">
-                    <label for="search" class="form-label">Kërko:</label>
-                    <input type="text" name="search" value="@ViewBag.Search" class="form-control form-control-custom" />
+                    <label for="searchString" class="form-label">🔍 Kërko</label>
+                    <input type="text" name="search" id="searchString" value="@ViewBag.Search" class="form-control form-control-custom" placeholder="Shkruani për të kërkuar..." autocomplete="search" />
                 </div>
                 <div class="filter-item">
-                    <label for="categoryId" class="form-label">Filtro sipas kategorisë:</label>
-                    @Html.DropDownList("categoryId", (SelectList)ViewBag.CategoryList, "Të gjitha", new { @class = "form-control form-control-custom" })
+                    <label for="categoryId" class="form-label">🏷️ Kategoria</label>
+                    @Html.DropDownList("categoryId", (SelectList)ViewBag.CategoryList, "Të gjitha", new { @class = "form-control form-control-custom", id = "categoryId" })
                 </div>
                 <div class="filter-item">
                     <button type="submit" class="btn btn-submit">Kërko</button>
@@ -175,69 +737,86 @@
             </div>
         }
 
-        <div class="mb-4">
-            @Html.ActionLink("Shto Destinacion të Ri", "Create", null, new { @class = "btn btn-create" })
+        <div class="create-button-container">
+            @Html.ActionLink("✨ Shto Destinacion të Ri", "Create", null, new { @class = "btn btn-create" })
         </div>
 
         @if (!Model.Any())
         {
             <div class="alert alert-warning">
-                Nuk u gjetën destinacione që përputhen me kriteret e kërkimit.
+                ⚠️ Nuk u gjetën destinacione që përputhen me kriteret e kërkimit.
             </div>
         }
         else
         {
-            <table class="table table-bordered">
-                <thead>
-                    <tr>
-                        <th>
-                            @Html.ActionLink("Emri", "Index", new { sortOrder = ViewBag.SortOrder == "name_desc" ? "" : "name_desc", categoryId = ViewBag.SelectedCategoryId })
-                        </th>
-                        <th>
-                            @Html.ActionLink("Rajoni", "Index", new { sortOrder = ViewBag.SortOrder == "region" ? "region_desc" : "region", categoryId = ViewBag.SelectedCategoryId })
-                        </th>
-                        <th>Përshkrimi</th>
-                        <th>
-                            @Html.ActionLink("Kategoria", "Index", new { sortOrder = ViewBag.SortOrder == "category" ? "category_desc" : "category", categoryId = ViewBag.SelectedCategoryId })
-                        </th>
-                        <th>Shpenzimi Minimal Ditor (ALL)</th>
-                        <th>Shpenzimi Maksimal Ditor (ALL)</th>
-                        <th>Foto</th>
-                        <th>Veprime</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model)
-                    {
-                        <tr>
-                            <td>@Html.DisplayFor(modelItem => item.Name)</td>
-                            <td>@Html.DisplayFor(modelItem => item.Region)</td>
-                            <td>@Html.DisplayFor(modelItem => item.Description)</td>
-                            <td>@Html.DisplayFor(modelItem => item.Category.Name)</td>
-                            <td>@Html.DisplayFor(modelItem => item.MinDailyExpenseAL)</td>
-                            <td>@Html.DisplayFor(modelItem => item.MaxDailyExpenseAL)</td>
-                            <td>
-                                @if (!string.IsNullOrEmpty(item.ImagePath))
-                                {
-                                    <img src="@item.ImagePath" alt="Foto" width="100" />
-                                }
-                                else
-                                {
-                                    <img src="@Url.Content("~/Content/Images/no-image.png")" alt="No Image" width="100" />
-                                }
-                            </td>
-                            <td class="action-links">
-                                @Html.ActionLink("Ndrysho", "Edit", new { id = item.Id }, new { @class = "text-warning" }) |
-                                @Html.ActionLink("Detajet", "Details", new { id = item.Id }, new { @class = "text-info" }) |
-                                @Html.ActionLink("Fshi", "Delete", new { id = item.Id }, new { @class = "text-danger" })
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
+            <div class="table-container">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>
+                                    @Html.ActionLink("📍 Emri", "Index", new { sortOrder = ViewBag.SortOrder == "name_desc" ? "" : "name_desc", categoryId = ViewBag.SelectedCategoryId })
+                                </th>
+                                <th>
+                                    @Html.ActionLink("🌍 Rajoni", "Index", new { sortOrder = ViewBag.SortOrder == "region" ? "region_desc" : "region", categoryId = ViewBag.SelectedCategoryId })
+                                </th>
+                                <th>📝 Përshkrimi</th>
+                                <th>
+                                    @Html.ActionLink("🏷️ Kategoria", "Index", new { sortOrder = ViewBag.SortOrder == "category" ? "category_desc" : "category", categoryId = ViewBag.SelectedCategoryId })
+                                </th>
+                                <th>💰 Min (ALL)</th>
+                                <th>💰 Max (ALL)</th>
+                                <th>📸 Foto</th>
+                                <th>⚡ Veprime</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>@Html.DisplayFor(modelItem => item.Name)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.Region)</td>
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(item.Description))
+                                        {
+                                            var truncatedDescription = item.Description.Length > 100
+                                                ? item.Description.Substring(0, 100) + "..."
+                                                : item.Description;
+
+                                            @truncatedDescription
+                                        }
+                                        else
+                                        {
+                                            <span class="text-muted">Pa përshkrim</span>
+                                        }
+                                    </td>
+                                    <td>@Html.DisplayFor(modelItem => item.Category.Name)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.MinDailyExpenseAL)</td>
+                                    <td>@Html.DisplayFor(modelItem => item.MaxDailyExpenseAL)</td>
+                                    <td>
+                                        @if (!string.IsNullOrEmpty(item.ImagePath))
+                                        {
+                                            <img src="@item.ImagePath" alt="Foto" />
+                                        }
+                                        else
+                                        {
+                                            <img src="@Url.Content("~/Content/Images/no-image.png")" alt="No Image" />
+                                        }
+                                    </td>
+                                    <td class="action-links">
+                                        @Html.ActionLink("✏️ Edit", "Edit", new { id = item.Id }, new { @class = "text-warning" })
+                                        @Html.ActionLink("👁️ View", "Details", new { id = item.Id }, new { @class = "text-info" })
+                                        @Html.ActionLink("🗑️ Delete", "Delete", new { id = item.Id }, new { @class = "text-danger" })
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
         }
 
-        <div class="text-center mt-4">
+        <div class="pagination">
             @Html.PagedListPager((IPagedList<DK1.Models.Destination>)Model, page => Url.Action("Index",
                 new { page, categoryId = ViewBag.SelectedCategoryId, sortOrder = ViewBag.SortOrder }))
         </div>

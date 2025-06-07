@@ -5,236 +5,1158 @@
     var lang = ViewBag.Language as string ?? "sq"; // default Shqip
 }
 
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+
 @section Styles {
     <style>
-        /* Scoped styles for the reservation form */
-        .reservation-form-container {
-            background-color: var(--body-bg);
-            color: var(--text-color);
-            transition: all 0.3s ease;
+/* Enhanced CSS variables for modern theming */
+:root {
+  /* Modern Color Palette */
+  --primary: #8b5cf6;
+  --primary-dark: #7c3aed;
+  --primary-light: #a78bfa;
+  --primary-lighter: #f3f4f6;
+  --secondary: #f59e0b;
+  --accent: #06b6d4;
+  --accent-dark: #0891b2;
+  --accent-light: #67e8f9;
+  --success: #10b981;
+  --info: #3b82f6;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --gold: #fbbf24;
+  --gold-dark: #f59e0b;
+
+  /* Modern Gradients */
+  --gradient-primary: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 50%, #6d28d9 100%);
+  --gradient-secondary: linear-gradient(135deg, #f59e0b 0%, #f97316 50%, #ea580c 100%);
+  --gradient-accent: linear-gradient(135deg, #06b6d4 0%, #0891b2 50%, #0e7490 100%);
+  --gradient-rainbow: linear-gradient(135deg, #8b5cf6 0%, #06b6d4 25%, #10b981 50%, #f59e0b 75%, #ef4444 100%);
+
+  /* Glass Effects */
+  --glassmorphism-light: rgba(255, 255, 255, 0.25);
+  --glassmorphism-dark: rgba(255, 255, 255, 0.08);
+  --backdrop-blur: blur(20px);
+  --backdrop-blur-strong: blur(30px);
+
+  /* Modern Shadows */
+  --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-medium: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-strong: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  --shadow-colored: 0 25px 50px -12px rgba(139, 92, 246, 0.3);
+  --shadow-glow: 0 0 40px rgba(139, 92, 246, 0.4);
+
+  /* Animation Variables */
+  --transition-fast: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-smooth: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Light Theme */
+[data-bs-theme="light"] {
+  --body-bg: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 25%, #e2e8f0 50%, #cbd5e1 75%, #94a3b8 100%);
+  --card-bg: rgba(255, 255, 255, 0.9);
+  --text-color: #0f172a;
+  --text-muted: #64748b;
+  --header-bg: rgba(248, 250, 252, 0.95);
+  --border-color: rgba(139, 92, 246, 0.2);
+  --overlay-bg: rgba(255, 255, 255, 0.9);
+  --form-bg: rgba(255, 255, 255, 0.95);
+  --selected-bg: rgba(139, 92, 246, 0.1);
+  --selected-color: var(--primary-dark);
+  --glassmorphism: var(--glassmorphism-light);
+  --shadow: var(--shadow-soft);
+
+  /* Light texture overlay */
+  --texture-pattern:
+    radial-gradient(circle at 20% 50%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 40% 80%, rgba(16, 185, 129, 0.06) 0%, transparent 50%);
+}
+
+/* Dark Theme */
+[data-bs-theme="dark"] {
+  --body-bg: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #533483 100%);
+  --card-bg: rgba(17, 24, 39, 0.95);
+  --text-color: #f8fafc;
+  --text-muted: #94a3b8;
+  --header-bg: rgba(15, 23, 42, 0.95);
+  --border-color: rgba(248, 250, 252, 0.15);
+  --overlay-bg: rgba(15, 23, 42, 0.95);
+  --form-bg: rgba(17, 24, 39, 0.95);
+  --selected-bg: rgba(139, 92, 246, 0.15);
+  --selected-color: var(--text-color);
+  --glassmorphism: var(--glassmorphism-dark);
+  --shadow: var(--shadow-strong);
+
+  /* Dark texture overlay */
+  --texture-pattern:
+    radial-gradient(circle at 20% 50%, rgba(139, 92, 246, 0.08) 0%, transparent 60%),
+    radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.06) 0%, transparent 60%),
+    radial-gradient(circle at 40% 80%, rgba(16, 185, 129, 0.04) 0%, transparent 60%);
+}
+
+/* Legacy support for data-theme attribute */
+[data-theme="dark"] {
+  --body-bg: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 25%, #16213e 50%, #0f3460 75%, #533483 100%);
+  --card-bg: rgba(17, 24, 39, 0.95);
+  --text-color: #f8fafc;
+  --text-muted: #94a3b8;
+  --header-bg: rgba(15, 23, 42, 0.95);
+  --border-color: rgba(248, 250, 252, 0.15);
+  --overlay-bg: rgba(15, 23, 42, 0.95);
+  --form-bg: rgba(17, 24, 39, 0.95);
+  --selected-bg: rgba(139, 92, 246, 0.15);
+  --selected-color: var(--text-color);
+  --glassmorphism: var(--glassmorphism-dark);
+  --shadow: var(--shadow-strong);
+  --texture-pattern:
+    radial-gradient(circle at 20% 50%, rgba(139, 92, 246, 0.08) 0%, transparent 60%),
+    radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.06) 0%, transparent 60%),
+    radial-gradient(circle at 40% 80%, rgba(16, 185, 129, 0.04) 0%, transparent 60%);
+}
+
+/* Enhanced body styling with modern backgrounds */
+body {
+  position: relative;
+  overflow-x: hidden;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  font-weight: 400;
+  line-height: 1.6;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -2;
+  background: var(--body-bg);
+  background-size: 400% 400%;
+  animation: gradientShift 15s ease infinite;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  background: var(--texture-pattern);
+  animation: floatingTexture 25s ease-in-out infinite;
+  opacity: 0.7;
+}
+
+@@keyframes gradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@@keyframes floatingTexture {
+  0%, 100% { transform: translateY(0px) rotate(0deg) scale(1); }
+  33% { transform: translateY(-30px) rotate(1deg) scale(1.02); }
+  66% { transform: translateY(-15px) rotate(-1deg) scale(0.98); }
+}
+
+/* Enhanced theme toggle positioning and styles */
+.theme-toggle-container {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  z-index: 999;
+}
+
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  background: var(--glassmorphism);
+  border: 2px solid var(--border-color);
+  border-radius: 50px;
+  padding: 10px;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  box-shadow: var(--shadow-medium);
+  backdrop-filter: var(--backdrop-blur);
+  position: relative;
+  overflow: hidden;
+}
+
+.theme-toggle::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: var(--gradient-rainbow);
+  transition: left 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 0.3;
+}
+
+.theme-toggle:hover {
+  transform: translateY(-5px) scale(1.08);
+  box-shadow: var(--shadow-strong), var(--shadow-glow);
+  border-color: var(--primary);
+}
+
+.theme-toggle:hover::before {
+  left: 100%;
+}
+
+.theme-icon {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: var(--transition-smooth);
+  margin: 0 6px;
+  position: relative;
+  z-index: 1;
+}
+
+.theme-icon svg {
+  width: 18px;
+  height: 18px;
+  transition: var(--transition-smooth);
+}
+
+.theme-icon.active {
+  background: var(--gradient-primary);
+  color: white;
+  transform: scale(1.3) rotate(15deg);
+  box-shadow: var(--shadow-colored);
+}
+
+.theme-icon:not(.active) {
+  color: var(--text-muted);
+  transform: scale(0.85);
+  opacity: 0.6;
+}
+
+/* Main reservation form container */
+.reservation-form-container {
+  background: transparent;
+  color: var(--text-color);
+  transition: var(--transition-smooth);
+  min-height: 100vh;
+  padding: 2rem 0;
+  padding-top: 1rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Floating particles background */
+.reservation-form-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image:
+    radial-gradient(3px 3px at 25px 35px, rgba(139, 92, 246, 0.4), transparent),
+    radial-gradient(2px 2px at 45px 75px, rgba(6, 182, 212, 0.3), transparent),
+    radial-gradient(1px 1px at 95px 45px, rgba(16, 185, 129, 0.3), transparent),
+    radial-gradient(2px 2px at 135px 85px, rgba(245, 158, 11, 0.3), transparent),
+    radial-gradient(1px 1px at 165px 35px, rgba(239, 68, 68, 0.3), transparent);
+  background-repeat: repeat;
+  background-size: 250px 120px;
+  animation: sparkleFloat 25s linear infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@@keyframes sparkleFloat {
+  0% { transform: translateY(0px) translateX(0px); opacity: 0.3; }
+  50% { opacity: 0.7; }
+  100% { transform: translateY(-120px) translateX(20px); opacity: 0.3; }
+}
+
+/* Enhanced text and button styling */
+.reservation-form-container .text-primary {
+  color: var(--primary) !important;
+  text-shadow: 0 2px 15px rgba(139, 92, 246, 0.3);
+  font-weight: 700;
+}
+
+.reservation-form-container .btn-primary {
+  background: var(--gradient-primary);
+  border: none;
+  border-radius: 25px;
+  padding: 18px 36px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  transition: var(--transition-smooth);
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-medium);
+  color: white;
+  backdrop-filter: blur(15px);
+  font-size: 0.95rem;
+}
+
+.reservation-form-container .btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  transition: left 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.reservation-form-container .btn-primary:hover {
+  background: var(--gradient-accent);
+  transform: translateY(-6px) scale(1.03);
+  box-shadow: var(--shadow-strong), var(--shadow-glow);
+  letter-spacing: 1.5px;
+}
+
+.reservation-form-container .btn-primary:hover::before {
+  left: 100%;
+}
+
+.reservation-form-container .btn-primary:active {
+  transform: translateY(-3px) scale(0.98);
+  box-shadow: var(--shadow-medium);
+}
+
+.reservation-form-container .btn-outline-primary {
+  border: 2px solid var(--primary);
+  color: var(--primary);
+  border-radius: 25px;
+  padding: 18px 36px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  transition: var(--transition-smooth);
+  background: var(--glassmorphism);
+  backdrop-filter: var(--backdrop-blur);
+  position: relative;
+  overflow: hidden;
+}
+
+.reservation-form-container .btn-outline-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: var(--gradient-primary);
+  transition: left 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: -1;
+}
+
+.reservation-form-container .btn-outline-primary:hover {
+  color: white;
+  transform: translateY(-6px) scale(1.03);
+  box-shadow: var(--shadow-strong), var(--shadow-glow);
+  border-color: transparent;
+  letter-spacing: 1.5px;
+}
+
+.reservation-form-container .btn-outline-primary:hover::before {
+  left: 0;
+}
+
+/* Enhanced form controls */
+.reservation-form-container .form-control {
+  background: var(--glassmorphism);
+  color: var(--text-color);
+  border: 2px solid var(--border-color);
+  border-radius: 25px;
+  padding: 18px 24px;
+  transition: var(--transition-smooth);
+  font-size: 16px;
+  font-weight: 500;
+  backdrop-filter: var(--backdrop-blur);
+  position: relative;
+}
+
+.reservation-form-container .form-control:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.15), var(--shadow-medium);
+  background: var(--form-bg);
+  color: var(--text-color);
+  transform: translateY(-3px) scale(1.02);
+  outline: none;
+}
+
+.reservation-form-container .form-control:hover:not(:focus) {
+  border-color: var(--primary-light);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-medium);
+}
+
+.reservation-form-container .form-control::placeholder {
+  color: var(--text-muted);
+  opacity: 0.7;
+  transition: opacity 0.3s ease;
+}
+
+.reservation-form-container .form-control:focus::placeholder {
+  opacity: 0.4;
+}
+
+.reservation-form-container .form-label {
+  font-weight: 700;
+  color: var(--text-color);
+  margin-bottom: 14px;
+  font-size: 16px;
+  letter-spacing: 0.5px;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  font-family: 'Inter', sans-serif;
+}
+
+/* Enhanced card styling */
+.reservation-form-container .card {
+  border: none;
+  border-radius: 40px;
+  background: var(--glassmorphism);
+  box-shadow: var(--shadow-strong);
+  backdrop-filter: var(--backdrop-blur-strong);
+  position: relative;
+  overflow: hidden;
+  border: 2px solid var(--border-color);
+  transition: var(--transition-smooth);
+}
+
+.reservation-form-container .card:hover {
+  transform: translateY(-8px) scale(1.01);
+  box-shadow: var(--shadow-strong), var(--shadow-glow);
+  border-color: var(--primary);
+}
+
+.reservation-form-container .card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 8px;
+  background: var(--gradient-primary);
+  border-radius: 40px 40px 0 0;
+}
+
+.reservation-form-container .card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background:
+    radial-gradient(circle at 25% 25%, rgba(139, 92, 246, 0.08) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(6, 182, 212, 0.06) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.04) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.reservation-form-container .card-title {
+  font-size: 2.8rem;
+  font-weight: 900;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 3.5rem;
+  text-align: center;
+  letter-spacing: -1.5px;
+  position: relative;
+  z-index: 1;
+  text-shadow: 0 4px 20px rgba(139, 92, 246, 0.4);
+  font-family: 'Inter', sans-serif;
+  line-height: 1.1;
+}
+
+/* Enhanced alert styling */
+.reservation-form-container .alert-danger {
+  background: rgba(239, 68, 68, 0.15);
+  border: 2px solid rgba(239, 68, 68, 0.3);
+  color: var(--text-color);
+  border-radius: 25px;
+  padding: 20px 28px;
+  font-weight: 600;
+  backdrop-filter: blur(20px);
+  box-shadow: var(--shadow-medium);
+}
+
+.reservation-form-container .alert-info {
+  background: var(--gradient-accent);
+  border: 2px solid var(--accent-light);
+  color: white;
+  border-radius: 25px;
+  font-weight: 600;
+  padding: 20px 28px;
+  box-shadow: var(--shadow-medium);
+  backdrop-filter: blur(20px);
+}
+
+/* Enhanced pricing table animations */
+.pricing-table {
+  display: none;
+  margin-top: 2.5rem;
+  animation: fadeInUp 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.pricing-table.show {
+  display: block;
+}
+
+@@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(60px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Enhanced pricing breakdown */
+.pricing-breakdown {
+  background: var(--glassmorphism) !important;
+  border: 2px solid var(--border-color);
+  border-radius: 35px;
+  padding: 3rem;
+  box-shadow: var(--shadow-strong);
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: var(--backdrop-blur-strong);
+  transition: var(--transition-smooth);
+}
+
+.pricing-breakdown:hover {
+  transform: translateY(-5px) scale(1.01);
+  box-shadow: var(--shadow-strong), var(--shadow-glow);
+  border-color: var(--primary);
+}
+
+.pricing-breakdown::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background:
+    radial-gradient(circle at 25% 25%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(6, 182, 212, 0.08) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.pricing-breakdown > * {
+  position: relative;
+  z-index: 1;
+}
+
+.pricing-breakdown h5 {
+  color: var(--primary);
+  font-weight: 800;
+  margin-bottom: 2.5rem;
+  font-size: 1.8rem;
+  letter-spacing: 0.5px;
+  text-shadow: 0 2px 10px rgba(139, 92, 246, 0.3);
+  font-family: 'Inter', sans-serif;
+}
+
+/* Enhanced table styling */
+.table {
+  background: transparent;
+  color: var(--text-color);
+  margin-bottom: 2.5rem;
+  border-radius: 25px;
+  overflow: hidden;
+}
+
+.table th {
+  border-top: none;
+  border-bottom: 3px solid var(--border-color);
+  color: var(--primary);
+  font-weight: 800;
+  font-size: 1.1rem;
+  background: var(--glassmorphism);
+  padding: 24px;
+  letter-spacing: 0.8px;
+  text-shadow: 0 1px 3px rgba(139, 92, 246, 0.3);
+  backdrop-filter: blur(15px);
+  text-transform: uppercase;
+}
+
+.table td {
+  border-top: 1px solid var(--border-color);
+  color: var(--text-color);
+  background: var(--glassmorphism);
+  padding: 20px 24px;
+  font-weight: 600;
+  backdrop-filter: blur(10px);
+  transition: var(--transition-fast);
+  font-size: 1rem;
+}
+
+.table tr:hover td {
+  background: var(--gradient-primary);
+  color: white;
+  transform: scale(1.02);
+  box-shadow: var(--shadow-medium);
+}
+
+.table-responsive {
+  border-radius: 25px;
+  overflow: hidden;
+  background: var(--glassmorphism);
+  border: 2px solid var(--border-color);
+  box-shadow: var(--shadow-medium);
+  backdrop-filter: var(--backdrop-blur);
+}
+
+.total-price {
+  font-size: 2.5rem;
+  font-weight: 900;
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -1px;
+  text-shadow: 0 4px 20px rgba(139, 92, 246, 0.4);
+  font-family: 'Inter', sans-serif;
+}
+
+.discount-info {
+  font-size: 1rem;
+  color: var(--text-muted);
+  font-style: italic;
+  font-weight: 600;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Enhanced loading state */
+.loading-overlay {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--overlay-bg);
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  border-radius: 40px;
+  backdrop-filter: var(--backdrop-blur-strong);
+}
+
+.loading-spinner {
+  border: 5px solid var(--border-color);
+  border-top: 5px solid var(--primary);
+  border-radius: 50%;
+  width: 70px;
+  height: 70px;
+  animation: spin 1s linear infinite;
+  box-shadow: var(--shadow-medium);
+}
+
+@@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.card-body {
+  position: relative;
+  padding: 4rem;
+  z-index: 1;
+}
+
+/* Enhanced theme toggle button styling */
+.theme-button-container {
+  margin-bottom: 4rem;
+  display: flex;
+  justify-content: center;
+}
+
+#themeToggle {
+  border-radius: 50px;
+  padding: 16px 32px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  transition: var(--transition-smooth);
+  background: var(--glassmorphism);
+  border: 2px solid var(--border-color);
+  color: var(--text-color);
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  box-shadow: var(--shadow-medium);
+  backdrop-filter: var(--backdrop-blur);
+  position: relative;
+  overflow: hidden;
+  text-transform: uppercase;
+}
+
+#themeToggle::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: var(--gradient-primary);
+  transition: left 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: -1;
+}
+
+#themeToggle:hover {
+  transform: translateY(-6px) scale(1.08);
+  box-shadow: var(--shadow-strong), var(--shadow-glow);
+  color: white;
+  border-color: transparent;
+  letter-spacing: 1.2px;
+}
+
+#themeToggle:hover::before {
+  left: 0;
+}
+
+/* Enhanced form validation styles */
+.was-validated .form-control:valid {
+  border-color: var(--success);
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%2310b981' d='m2.3 6.73.94-.94 4.94-4.94'/%3e%3c/svg%3e");
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15), var(--shadow-medium);
+}
+
+.was-validated .form-control:invalid {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.15), var(--shadow-medium);
+}
+
+/* Enhanced scrollbar */
+::-webkit-scrollbar {
+  width: 14px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--glassmorphism);
+  border-radius: 12px;
+  backdrop-filter: blur(15px);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--gradient-primary);
+  border-radius: 12px;
+  box-shadow: var(--shadow-medium);
+  transition: var(--transition-fast);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--gradient-accent);
+  box-shadow: var(--shadow-strong);
+  transform: scale(1.1);
+}
+
+/* Enhanced button ripple effect */
+.btn-primary, .btn-outline-primary {
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary:active::after,
+.btn-outline-primary:active::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.6);
+            transform: translate(-50%, -50%);
+            animation: ripple 0.6s ease-out;
         }
 
-            .reservation-form-container .text-primary {
-                color: var(--primary) !important;
+        @@keyframes ripple {
+            to {
+                width: 300px;
+                height: 300px;
+                opacity: 0;
             }
-
-            .reservation-form-container .btn-primary {
-                background-color: var(--primary);
-                border-color: var(--primary-dark);
-            }
-
-                .reservation-form-container .btn-primary:hover {
-                    background-color: var(--primary-dark);
-                    border-color: var(--primary-dark);
-                }
-
-            .reservation-form-container .form-control {
-                background-color: var(--card-bg);
-                color: var(--text-color);
-                border-color: var(--border-color);
-            }
-
-            .reservation-form-container .card {
-                border: none;
-                border-radius: 1rem;
-                background-color: var(--card-bg);
-            }
-
-            .reservation-form-container .alert-danger {
-                background-color: rgba(220, 53, 69, 0.1);
-                border-color: rgba(220, 53, 69, 0.3);
-                color: var(--text-color);
-            }
-
-        .pricing-table {
-            display: none;
-            margin-top: 1rem;
         }
 
-            .pricing-table.show {
-                display: block;
-            }
-
-        .pricing-breakdown {
-            background-color: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 0.5rem;
-            padding: 1rem;
+        /* Glowing text effect for titles */
+        .card-title {
+            position: relative;
         }
 
-        .total-price {
-            font-size: 1.25rem;
-            font-weight: bold;
-            color: var(--primary);
+        .card-title::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: var(--gradient-primary);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            filter: blur(2px);
+            opacity: 0.7;
+            z-index: -1;
         }
 
-        .discount-info {
-            font-size: 0.875rem;
-            color: var(--text-muted);
-            font-style: italic;
-        }
-
-        /* Loading state for submission */
-        .loading-overlay {
-            display: none;
+        /* Particle background effect */
+        .reservation-form-container::before {
+            content: '';
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(255, 255, 255, 0.7);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
+            background-image:
+                radial-gradient(2px 2px at 20px 30px, rgba(130, 199, 165, 0.3), transparent),
+                radial-gradient(2px 2px at 40px 70px, rgba(158, 197, 254, 0.3), transparent),
+                radial-gradient(1px 1px at 90px 40px, rgba(164, 222, 195, 0.3), transparent),
+                radial-gradient(1px 1px at 130px 80px, rgba(130, 199, 165, 0.3), transparent),
+                radial-gradient(2px 2px at 160px 30px, rgba(158, 197, 254, 0.3), transparent);
+            background-repeat: repeat;
+            background-size: 200px 100px;
+            animation: sparkle 20s linear infinite;
+            pointer-events: none;
+            z-index: 0;
         }
 
-        .loading-spinner {
-            border: 4px solid #f3f3f3;
-            border-top: 4px solid var(--primary);
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
+        @@keyframes sparkle {
+            0% { transform: translateY(0px); }
+            100% { transform: translateY(-100px); }
         }
 
-        @@keyframes spin {
-            0% {
-                transform: rotate(0deg);
+        /* Enhanced focus rings */
+        .form-control:focus,
+        .btn:focus,
+        .theme-toggle:focus,
+        #themeToggle:focus {
+            outline: 3px solid var(--primary);
+            outline-offset: 3px;
+            box-shadow: 0 0 0 0.25rem rgba(130, 199, 165, 0.25), var(--shadow-glow);
+        }
+
+        /* Responsive design */
+        @@media (max-width: 768px) {
+            .theme-toggle-container {
+                top: 70px;
+                right: 15px;
             }
 
-            100% {
-                transform: rotate(360deg);
+            .reservation-form-container .card-title {
+                font-size: 2rem;
+                margin-bottom: 2rem;
+            }
+
+            .card-body {
+                padding: 2.5rem;
+            }
+
+            .theme-toggle {
+                padding: 6px;
+            }
+
+            .theme-icon {
+                width: 20px;
+                height: 20px;
+            }
+
+            .theme-icon svg {
+                width: 14px;
+                height: 14px;
+            }
+
+            .theme-button-container {
+                margin-bottom: 2rem;
+            }
+
+            #themeToggle {
+                padding: 12px 24px;
+                font-size: 0.9rem;
+            }
+
+            .reservation-form-container .btn-primary,
+            .reservation-form-container .btn-outline-primary {
+                padding: 14px 28px;
+                font-size: 0.9rem;
+            }
+
+            .pricing-breakdown {
+                padding: 2rem;
+            }
+
+            .table th,
+            .table td {
+                padding: 14px;
+                font-size: 0.9rem;
+            }
+
+            .total-price {
+                font-size: 1.5rem;
             }
         }
 
-        .card-body {
-            position: relative;
+        @@media (max-width: 480px) {
+            .card-body {
+                padding: 2rem;
+            }
+
+            .reservation-form-container .card-title {
+                font-size: 1.75rem;
+            }
+
+            .theme-toggle-container {
+                right: 10px;
+            }
+
+            .reservation-form-container .card {
+                border-radius: 30px;
+            }
+
+            .pricing-breakdown {
+                border-radius: 24px;
+                padding: 1.5rem;
+            }
+
+            .table-responsive {
+                border-radius: 16px;
+            }
+        }
+
+        /* Advanced glassmorphism effects */
+        [data-bs-theme="light"] .card,
+        [data-theme="light"] .card {
+            background: rgba(255, 255, 255, 0.25);
+            box-shadow:
+                0 8px 32px rgba(31, 38, 135, 0.37),
+                inset 0 1px 0 rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
+        [data-bs-theme="dark"] .card,
+        [data-theme="dark"] .card {
+            background: rgba(17, 25, 40, 0.75);
+            box-shadow:
+                0 8px 32px rgba(0, 0, 0, 0.5),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Morphing gradients */
+        @@keyframes morphGradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .btn-primary {
+            background-size: 200% 200%;
+            animation: morphGradient 3s ease infinite;
+        }
+
+        /* Floating animation for cards */
+        @@keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .card:hover {
+            animation: float 3s ease-in-out infinite;
+        }
+
+        /* Enhanced typography */
+        .card-title {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            font-weight: 900;
+            line-height: 1.1;
+        }
+
+        .form-label {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+        }
+
+        /* Smooth transitions for all interactive elements */
+        * {
+            transition:
+                box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                background 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+                border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Performance optimizations */
+        .card,
+        .form-control,
+        .btn,
+        .theme-toggle {
+            will-change: transform, box-shadow;
+        }
+
+        /* Reduced motion preferences */
+        @@media (prefers-reduced-motion: reduce) {
+            *,
+            ::before,
+            ::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: 0.01ms !important;
+            }
         }
     </style>
 }
 
-<div class="reservation-form-container container py-4 py-lg-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card shadow">
-                <div class="card-body">
-                    <h2 class="card-title text-primary mb-4">
-                        @(lang == "en" ? "Reservation for" : "Rezervim për") @Model.DestinationName
-                    </h2>
-                    @using (Html.BeginForm("ReservationForm", "Home", FormMethod.Post, new { @class = "needs-validation", novalidate = true, id = "reservationForm" }))
-                    {
-                        @Html.AntiForgeryToken()
-                        @Html.HiddenFor(model => model.DestinationId)
-                        @Html.HiddenFor(model => model.DestinationName)
-                        @Html.Hidden("totalCost", "0", new { id = "hiddenTotalCost" }) <!-- Hidden field to store total cost -->
+<!-- Theme Toggle moved to container -->
+<div class="reservation-form-container">
+    <div class="container py-4 py-lg-5">
+        <div class="theme-button-container">
+            <div class="d-flex justify-content-end">
+                <button class="btn btn-outline-primary" id="themeToggle">
+                    <i class="bi bi-sun-fill d-none" id="lightIcon"></i>
+                    <i class="bi bi-moon-fill" id="darkIcon"></i>
 
-                        <div class="mb-3">
-                            @Html.LabelFor(model => model.UserName, lang == "en" ? "Full Name" : "Emri i Plotë", new { @class = "form-label" })
-                            @Html.TextBoxFor(model => model.UserName, new { @class = "form-control", required = "required", aria_required = "true" })
-                            @Html.ValidationMessageFor(model => model.UserName, "", new { @class = "text-danger" })
-                        </div>
+                </button>
+            </div>
+        </div>
 
-                        <div class="mb-3">
-                            @Html.LabelFor(model => model.Email, lang == "en" ? "Email Address" : "Adresa e Email-it", new { @class = "form-label" })
-                            @Html.TextBoxFor(model => model.Email, new { @class = "form-control", type = "email", required = "required", aria_required = "true" })
-                            @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
-                        </div>
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow">
+                    <div class="card-body">
+                        <h2 class="card-title text-primary mb-4">
+                            @(lang == "en" ? "Reservation for" : "Rezervim për") @Model.DestinationName
+                        </h2>
+                        @using (Html.BeginForm("ReservationForm", "Home", FormMethod.Post, new { @class = "needs-validation", novalidate = true, id = "reservationForm" }))
+                        {
+                            @Html.AntiForgeryToken()
+                            @Html.HiddenFor(model => model.DestinationId)
+                            @Html.HiddenFor(model => model.DestinationName)
+                            @Html.Hidden("totalCost", "0", new { id = "hiddenTotalCost" })
 
-                        <div class="mb-3">
-                            @Html.LabelFor(model => model.Phone, lang == "en" ? "Phone Number" : "Numri i Telefonit", new { @class = "form-label" })
-                            @Html.TextBoxFor(model => model.Phone, new { @class = "form-control", type = "tel", aria_required = "false" })
-                            @Html.ValidationMessageFor(model => model.Phone, "", new { @class = "text-danger" })
-                        </div>
+                            <div class="mb-3">
+                                @Html.LabelFor(model => model.UserName, lang == "en" ? "Full Name" : "Emri i Plotë", new { @class = "form-label" })
+                                @Html.TextBoxFor(model => model.UserName, new { @class = "form-control", required = "required", aria_required = "true", placeholder = lang == "en" ? "Enter your full name" : "Shkruani emrin tuaj të plotë" })
+                                @Html.ValidationMessageFor(model => model.UserName, "", new { @class = "text-danger" })
+                            </div>
 
-                        <div class="mb-3">
-                            @Html.LabelFor(model => model.ReservationDate, lang == "en" ? "Reservation Date" : "Data e Rezervimit", new { @class = "form-label" })
-                            @Html.TextBoxFor(model => model.ReservationDate, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date", required = "required", aria_required = "true" })
-                            @Html.ValidationMessageFor(model => model.ReservationDate, "", new { @class = "text-danger" })
-                        </div>
+                            <div class="mb-3">
+                                @Html.LabelFor(model => model.Email, lang == "en" ? "Email Address" : "Adresa e Email-it", new { @class = "form-label" })
+                                @Html.TextBoxFor(model => model.Email, new { @class = "form-control", type = "email", required = "required", aria_required = "true", placeholder = lang == "en" ? "example@email.com" : "shembull@email.com" })
+                                @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+                            </div>
 
-                        <div class="mb-3">
-                            @Html.LabelFor(model => model.NumberOfPeople, lang == "en" ? "Number of People" : "Numri i Personave", new { @class = "form-label" })
-                            @Html.TextBoxFor(model => model.NumberOfPeople, new { @class = "form-control", type = "number", min = "1", max = "100", required = "required", id = "NumberOfPeople", aria_required = "true" })
-                            @Html.ValidationMessageFor(model => model.NumberOfPeople, "", new { @class = "text-danger" })
-                        </div>
+                            <div class="mb-3">
+                                @Html.LabelFor(model => model.Phone, lang == "en" ? "Phone Number" : "Numri i Telefonit", new { @class = "form-label" })
+                                @Html.TextBoxFor(model => model.Phone, new { @class = "form-control", type = "tel", aria_required = "false", placeholder = lang == "en" ? "+355 XX XXX XXXX" : "+355 XX XXX XXXX" })
+                                @Html.ValidationMessageFor(model => model.Phone, "", new { @class = "text-danger" })
+                            </div>
 
-                        <div class="mb-3">
-                            @Html.LabelFor(model => model.NumberOfDays, lang == "en" ? "Number of Days" : "Numri i Ditëve", new { @class = "form-label" })
-                            @Html.TextBoxFor(model => model.NumberOfDays, new { @class = "form-control", type = "number", min = "1", max = "30", id = "NumberOfDays", aria_required = "true" })
-                            @Html.ValidationMessageFor(model => model.NumberOfDays, "", new { @class = "text-danger" })
-                        </div>
+                            <div class="mb-3">
+                                @Html.LabelFor(model => model.ReservationDate, lang == "en" ? "Reservation Date" : "Data e Rezervimit", new { @class = "form-label" })
+                                @Html.TextBoxFor(model => model.ReservationDate, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date", required = "required", aria_required = "true" })
+                                @Html.ValidationMessageFor(model => model.ReservationDate, "", new { @class = "text-danger" })
+                            </div>
 
-                        <!-- Pricing Table -->
-                        <div id="pricingTable" class="pricing-table">
-                            <div class="pricing-breakdown">
-                                <h5 class="mb-3">@(lang == "en" ? "Price Breakdown" : "Ndarja e Çmimit")</h5>
+                            <div class="mb-3">
+                                @Html.LabelFor(model => model.NumberOfPeople, lang == "en" ? "Number of People" : "Numri i Personave", new { @class = "form-label" })
+                                @Html.TextBoxFor(model => model.NumberOfPeople, new { @class = "form-control", type = "number", min = "1", max = "100", required = "required", id = "NumberOfPeople", aria_required = "true", placeholder = lang == "en" ? "1" : "1" })
+                                @Html.ValidationMessageFor(model => model.NumberOfPeople, "", new { @class = "text-danger" })
+                            </div>
 
-                                <div class="table-responsive">
-                                    <table class="table table-sm">
-                                        <thead>
-                                            <tr>
-                                                <th scope="col">@(lang == "en" ? "Person" : "Personi")</th>
-                                                <th scope="col">@(lang == "en" ? "Base Price/Day" : "Çmimi Bazë/Ditë")</th>
-                                                <th scope="col">@(lang == "en" ? "Discount" : "Zbritje")</th>
-                                                <th scope="col">@(lang == "en" ? "Price/Day" : "Çmimi/Ditë")</th>
-                                                <th scope="col">@(lang == "en" ? "Total" : "Totali")</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="pricingTableBody">
-                                        </tbody>
-                                    </table>
-                                </div>
+                            <div class="mb-3">
+                                @Html.LabelFor(model => model.NumberOfDays, lang == "en" ? "Number of Days" : "Numri i Ditëve", new { @class = "form-label" })
+                                @Html.TextBoxFor(model => model.NumberOfDays, new { @class = "form-control", type = "number", min = "1", max = "30", id = "NumberOfDays", aria_required = "true", placeholder = lang == "en" ? "1" : "1" })
+                                @Html.ValidationMessageFor(model => model.NumberOfDays, "", new { @class = "text-danger" })
+                            </div>
 
-                                <hr>
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <span class="total-price">@(lang == "en" ? "Total Cost:" : "Kosto Totale:")</span>
-                                    <span id="totalCost" class="total-price">0 ALL</span>
-                                </div>
-                                <div class="discount-info mt-2">
-                                    @(lang == "en" ? "* Discount: 2% per additional person, up to 20%" : "* Zbritje: 2% për çdo person shtesë, deri në 20%")
+                            <!-- Pricing Table -->
+                            <div id="pricingTable" class="pricing-table">
+                                <div class="pricing-breakdown">
+                                    <h5 class="mb-3">@(lang == "en" ? "Price Breakdown" : "Ndarja e Çmimit")</h5>
+
+                                    <div class="table-responsive">
+                                        <table class="table table-sm">
+                                            <thead>
+                                                <tr>
+                                                    <th scope="col">@(lang == "en" ? "Person" : "Personi")</th>
+                                                    <th scope="col">@(lang == "en" ? "Base Price/Day" : "Çmimi Bazë/Ditë")</th>
+                                                    <th scope="col">@(lang == "en" ? "Discount" : "Zbritje")</th>
+                                                    <th scope="col">@(lang == "en" ? "Price/Day" : "Çmimi/Ditë")</th>
+                                                    <th scope="col">@(lang == "en" ? "Total" : "Totali")</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody id="pricingTableBody">
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+                                    <hr>
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span class="total-price">@(lang == "en" ? "Total Cost:" : "Kosto Totale:")</span>
+                                        <span id="totalCost" class="total-price">0 ALL</span>
+                                    </div>
+                                    <div class="discount-info mt-2">
+                                        @(lang == "en" ? "* Discount: 2% per additional person, up to 20%" : "* Zbritje: 2% për çdo person shtesë, deri në 20%")
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        if (Model.EstimatedPrice.HasValue)
-                        {
-                            <div class="alert alert-info">
-                                @(lang == "en" ? "Estimated Total Price:" : "Çmimi Total i Vlerësuar:") <strong>@Model.EstimatedPrice.Value.ToString("C")</strong>
+                            if (Model.EstimatedPrice.HasValue)
+                            {
+                                <div class="alert alert-info">
+                                    @(lang == "en" ? "Estimated Total Price:" : "Çmimi Total i Vlerësuar:") <strong>@Model.EstimatedPrice.Value.ToString("C")</strong>
+                                </div>
+                            }
+
+                            <!-- Payment Method Selection -->
+                            <div class="mb-3">
+                                @Html.LabelFor(model => model.PaymentMethod, lang == "en" ? "Payment Method" : "Metoda e Pagesës", new { @class = "form-label" })
+                                @Html.DropDownListFor(model => model.PaymentMethod, new SelectList(new[]
+                                {
+                                    new { Value = "", Text = lang == "en" ? "Select Payment Method" : "Zgjidh Metodën e Pagesës" },
+                                    new { Value = "Physical", Text = lang == "en" ? "Physical (Pay on Arrival)" : "Fizike (Paguaj në Arritje)" },
+                                    new { Value = "PayPal", Text = "PayPal" }
+                                }, "Value", "Text"), new { @class = "form-control", required = "required", aria_required = "true", id = "PaymentMethod" })
+                                @Html.ValidationMessageFor(model => model.PaymentMethod, "", new { @class = "text-danger" })
+                            </div>
+
+                            <div class="mb-3">
+                                @Html.LabelFor(model => model.Notes, lang == "en" ? "Additional Notes" : "Shënime Shtesë", new { @class = "form-label" })
+                                @Html.TextAreaFor(model => model.Notes, new { @class = "form-control", rows = "4", placeholder = lang == "en" ? "Any special requests or additional information..." : "Çdo kërkesë të veçantë ose informacion shtesë..." })
+                                @Html.ValidationMessageFor(model => model.Notes, "", new { @class = "text-danger" })
+                            </div>
+
+                            <div class="d-grid gap-2 position-relative">
+                                <button type="submit" class="btn btn-primary" id="submitButton">
+                                    <i class="bi bi-calendar-check me-2"></i>
+                                    @(lang == "en" ? "Submit Reservation" : "Dërgo Rezervimin")
+                                </button>
+                                <a href="@Url.Action("GuidaTuristike", "Home", new { language = lang })" class="btn btn-outline-primary">
+                                    <i class="bi bi-arrow-left me-2"></i>
+                                    @(lang == "en" ? "Back to Destinations" : "Kthehu te Destinacionet")
+                                </a>
+                                <div class="loading-overlay" id="loadingOverlay">
+                                    <div class="loading-spinner"></div>
+                                </div>
                             </div>
                         }
-
-                        <!-- Payment Method Selection -->
-                        <div class="mb-3">
-                            @Html.LabelFor(model => model.PaymentMethod, lang == "en" ? "Payment Method" : "Metoda e Pagesës", new { @class = "form-label" })
-                            @Html.DropDownListFor(model => model.PaymentMethod, new SelectList(new[]
-                            {
-                                new { Value = "", Text = lang == "en" ? "Select Payment Method" : "Zgjidh Metodën e Pagesës" },
-                                new { Value = "Physical", Text = lang == "en" ? "Physical (Pay on Arrival)" : "Fizike (Paguaj në Arritje)" },
-                                new { Value = "PayPal", Text = "PayPal" }
-                            }, "Value", "Text"), new { @class = "form-control", required = "required", aria_required = "true", id = "PaymentMethod" })
-                            @Html.ValidationMessageFor(model => model.PaymentMethod, "", new { @class = "text-danger" })
-                        </div>
-
-                        <div class="mb-3">
-                            @Html.LabelFor(model => model.Notes, lang == "en" ? "Additional Notes" : "Shënime Shtesë", new { @class = "form-label" })
-                            @Html.TextAreaFor(model => model.Notes, new { @class = "form-control", rows = "4" })
-                            @Html.ValidationMessageFor(model => model.Notes, "", new { @class = "text-danger" })
-                        </div>
-
-                        <div class="d-grid gap-2 position-relative">
-                            <button type="submit" class="btn btn-primary" id="submitButton">
-                                <i class="bi bi-calendar-check me-2"></i>
-                                @(lang == "en" ? "Submit Reservation" : "Dërgo Rezervimin")
-                            </button>
-                            <a href="@Url.Action("GuidaTuristike", "Home", new { language = lang })" class="btn btn-outline-primary">
-                                <i class="bi bi-arrow-left me-2"></i>
-                                @(lang == "en" ? "Back to Destinations" : "Kthehu te Destinacionet")
-                            </a>
-                            <div class="loading-overlay" id="loadingOverlay">
-                                <div class="loading-spinner"></div>
-                            </div>
-                        </div>
-                    }
+                    </div>
                 </div>
             </div>
         </div>
@@ -243,88 +1165,142 @@
 
 @section Scripts {
     <script>
-        (function () {
-            'use strict';
+    (function () {
+        'use strict';
 
-            const forms = document.querySelectorAll('.needs-validation');
-            const submitButton = document.getElementById('submitButton');
-            const loadingOverlay = document.getElementById('loadingOverlay');
+        // Theme toggle functionality
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            updateThemeIcons(savedTheme);
+        }
 
-            Array.from(forms).forEach(form => {
-                form.addEventListener('submit', event => {
-                    if (!form.checkValidity()) {
-                        event.preventDefault();
-                        event.stopPropagation();
-                    } else {
-                        // Show loading spinner when form is valid and being submitted
-                        submitButton.disabled = true;
-                        loadingOverlay.style.display = 'flex';
-                    }
-                    form.classList.add('was-validated');
-                }, false);
-            });
+        function updateThemeIcons(theme) {
+            const lightIcon = document.getElementById('lightIcon');
+            const darkIcon = document.getElementById('darkIcon');
 
-            // Pricing logic
-            const peopleInput = document.getElementById("NumberOfPeople");
-            const daysInput = document.getElementById("NumberOfDays");
-            const pricingTable = document.getElementById("pricingTable");
-            const pricingTableBody = document.getElementById("pricingTableBody");
-            const totalCostElement = document.getElementById("totalCost");
-            const hiddenTotalCost = document.getElementById("hiddenTotalCost");
-            const medianPrice = @(Model.MedianDailyExpenseAL?.ToString("F2") ?? "0");
+            if (theme === 'dark') {
+                lightIcon.classList.remove('d-none');
+                darkIcon.classList.add('d-none');
+            } else {
+                lightIcon.classList.add('d-none');
+                darkIcon.classList.remove('d-none');
+            }
+        }
 
-            function calculatePrice() {
-                const people = parseInt(peopleInput.value) || 0;
-                const days = parseInt(daysInput.value) || 1;
-                const base = parseFloat(medianPrice);
+        // Theme toggle button event listener
+        document.getElementById('themeToggle').addEventListener('click', function() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
 
-                if (people <= 0 || isNaN(base)) {
-                    pricingTable.classList.remove('show');
-                    return;
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcons(newTheme);
+        });
+
+        // Initialize theme on page load
+        initTheme();
+
+        // Form validation and submission
+        const forms = document.querySelectorAll('.needs-validation');
+        const submitButton = document.getElementById('submitButton');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+
+        Array.from(forms).forEach(form => {
+            form.addEventListener('submit', event => {
+                if (!form.checkValidity()) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                } else {
+                    // Show loading spinner when form is valid and being submitted
+                    submitButton.disabled = true;
+                    loadingOverlay.style.display = 'flex';
                 }
+                form.classList.add('was-validated');
+            }, false);
+        });
 
-                pricingTable.classList.add('show');
-                pricingTableBody.innerHTML = '';
+        // Pricing logic
+        const peopleInput = document.getElementById("NumberOfPeople");
+        const daysInput = document.getElementById("NumberOfDays");
+        const pricingTable = document.getElementById("pricingTable");
+        const pricingTableBody = document.getElementById("pricingTableBody");
+        const totalCostElement = document.getElementById("totalCost");
+        const hiddenTotalCost = document.getElementById("hiddenTotalCost");
+        const medianPrice = parseFloat("@(Model.MedianDailyExpenseAL?.ToString("F2", System.Globalization.CultureInfo.InvariantCulture) ?? "0")");
 
-                // Calculate discount: 2% per additional person, capped at 20%
-                const additionalPeople = people > 1 ? people - 1 : 0; // Additional people after the first
-                const discountPercent = Math.min(additionalPeople * 2, 20); // 2% per additional person, capped at 20%
-                const discount = discountPercent / 100; // Convert to decimal
 
-                // Calculate total base cost and apply discount
-                const totalBaseCost = base * people * days;
-                const discountedTotal = totalBaseCost * (1 - discount);
-                const pricePerDay = base * (1 - discount); // Discounted price per day
 
-                // Populate the table
-                for (let i = 0; i < people; i++) {
-                    const totalForPerson = pricePerDay * days;
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
-                        <td>${i + 1}</td>
-                        <td>${base.toFixed(2)} ALL</td>
-                        <td>${discountPercent}%</td>
-                        <td>${pricePerDay.toFixed(2)} ALL</td>
-                        <td>${totalForPerson.toFixed(2)} ALL</td>
-                    `;
-                    pricingTableBody.appendChild(row);
-                }
+        function calculatePrice() {
+            const people = parseInt(peopleInput.value) || 0;
+            const days = parseInt(daysInput.value) || 1;
+            const base = parseFloat(medianPrice);
 
-                // Update total cost
-                const formattedTotal = discountedTotal.toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                }) + " ALL";
-                totalCostElement.textContent = formattedTotal;
-                // Update hidden field with total cost in ALL (without formatting)
-                hiddenTotalCost.value = discountedTotal.toFixed(2);
+            if (people <= 0 || isNaN(base)) {
+                pricingTable.classList.remove('show');
+                return;
             }
 
-            peopleInput.addEventListener("input", calculatePrice);
-            daysInput.addEventListener("input", calculatePrice);
+            pricingTable.classList.add('show');
+            pricingTableBody.innerHTML = '';
 
-            // Calculate on page load if values exist
-            calculatePrice();
-        })();
+            // Calculate discount: 2% per additional person, capped at 20%
+            const additionalPeople = people > 1 ? people - 1 : 0;
+            const discountPercent = Math.min(additionalPeople * 2, 20);
+            const discount = discountPercent / 100;
+
+            // Calculate total base cost and apply discount
+            const totalBaseCost = base * people * days;
+            const discountedTotal = totalBaseCost * (1 - discount);
+            const pricePerDay = base * (1 - discount);
+
+            // Populate the table
+            for (let i = 0; i < people; i++) {
+                const totalForPerson = pricePerDay * days;
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${i + 1}</td>
+                    <td>${base.toFixed(2)} ALL</td>
+                    <td>${discountPercent}%</td>
+                    <td>${pricePerDay.toFixed(2)} ALL</td>
+                    <td>${totalForPerson.toFixed(2)} ALL</td>
+                `;
+                pricingTableBody.appendChild(row);
+            }
+
+            // Update total cost
+            const formattedTotal = discountedTotal.toLocaleString(undefined, {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }) + " ALL";
+            totalCostElement.textContent = formattedTotal;
+            hiddenTotalCost.value = discountedTotal.toFixed(2);
+        }
+
+        peopleInput.addEventListener("input", calculatePrice);
+        daysInput.addEventListener("input", calculatePrice);
+
+        // Calculate on page load if values exist
+        calculatePrice();
+
+        // Enhanced form interactions
+        document.querySelectorAll('.form-control').forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.style.transform = 'translateY(-2px)';
+                this.parentElement.style.transition = 'transform 0.3s ease';
+            });
+
+            input.addEventListener('blur', function() {
+                this.parentElement.style.transform = 'translateY(0)';
+            });
+        });
+
+        // Set minimum date to today
+        const dateInput = document.querySelector('input[type="date"]');
+        if (dateInput) {
+            const today = new Date().toISOString().split('T')[0];
+            dateInput.setAttribute('min', today);
+        }
+    })();
     </script>
 }

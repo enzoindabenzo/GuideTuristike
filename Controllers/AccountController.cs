@@ -40,6 +40,15 @@ namespace DK1.Controllers
             private set => _userManager = value;
         }
 
+        [HttpGet]
+        [Route("signin-oidc")]
+        public ActionResult SignInOidc()
+        {
+            // This will be handled by the OWIN middleware
+            // Just redirect to home or login success page
+            return RedirectToAction("Index", "Home");
+        }
+
         //
         // GET: /Account/Login
         [AllowAnonymous]
@@ -279,9 +288,10 @@ namespace DK1.Controllers
                     properties.Dictionary["auth_type"] = "rerequest";
                     properties.Dictionary["scope"] = "email,public_profile";
                 }
-                else if (provider.Equals("GitHub", StringComparison.OrdinalIgnoreCase))
+                else if (provider.Contains("OpenIdConnect") || provider.Equals("Microsoft", StringComparison.OrdinalIgnoreCase))
                 {
-                    properties.Dictionary["scope"] = "user:email";
+                    properties.Dictionary["scope"] = "openid profile email";
+                    properties.Dictionary["prompt"] = "select_account"; // Allow user to select account
                 }
 
                 Debug.WriteLine($"ExternalLogin: Triggering {provider} authentication challenge.");
@@ -303,11 +313,13 @@ namespace DK1.Controllers
             try
             {
                 Debug.WriteLine("ExternalLoginCallback: Starting callback processing...");
+                Debug.WriteLine($"ExternalLoginCallback: Request URL={Request.Url?.ToString() ?? "null"}");
+                Debug.WriteLine($"ExternalLoginCallback: QueryString={Request.QueryString?.ToString() ?? "null"}");
 
                 var loginInfo = await AuthenticationManager.GetExternalLoginInfoAsync();
                 if (loginInfo == null)
                 {
-                    Debug.WriteLine("ExternalLoginCallback: loginInfo is null. Authentication may have failed or been cancelled.");
+                    Debug.WriteLine("ExternalLoginCallback: loginInfo is null. Possible causes: Cookie cleared, callback URL mismatch, invalid client ID/secret, or user cancelled.");
                     TempData["ErrorMessage"] = "External authentication failed. Please try again.";
                     return RedirectToAction("Login");
                 }
@@ -317,35 +329,51 @@ namespace DK1.Controllers
                 Debug.WriteLine($"ExternalLoginCallback: DefaultUserName={loginInfo.DefaultUserName ?? "Unknown"}");
                 Debug.WriteLine($"ExternalLoginCallback: Email={loginInfo.Email ?? "Unknown"}");
 
-                // Log all claims for debugging
-                var claims = loginInfo.ExternalIdentity.Claims;
-                foreach (var claim in claims)
+                // Log all claims
+                var claims = loginInfo.ExternalIdentity?.Claims;
+                if (claims != null)
                 {
-                    Debug.WriteLine($"ExternalLoginCallback: Claim - {claim.Type}: {claim.Value}");
+                    foreach (var claim in claims)
+                    {
+                        Debug.WriteLine($"ExternalLoginCallback: Claim - {claim.Type}: {claim.Value}");
+                    }
+                }
+                else
+                {
+                    Debug.WriteLine("ExternalLoginCallback: No claims available.");
                 }
 
-                // Try to get email from various sources
+                // Try to get email or fallback to a unique identifier
                 var email = loginInfo.Email ??
-                           loginInfo.ExternalIdentity.FindFirstValue(ClaimTypes.Email) ??
-                           loginInfo.ExternalIdentity.FindFirstValue("GitHubEmail") ??
-                           loginInfo.ExternalIdentity.FindFirstValue("FacebookEmail");
+                            loginInfo.ExternalIdentity?.FindFirstValue(ClaimTypes.Email) ??
+                            loginInfo.ExternalIdentity?.FindFirstValue("preferred_username") ??
+                            loginInfo.ExternalIdentity?.FindFirstValue("AzureEmail");
 
-                // For GitHub, fallback to username if no email
-                if (string.IsNullOrEmpty(email) && loginInfo.Login?.LoginProvider == "GitHub")
+                // Handle Microsoft-specific fallback
+                if (string.IsNullOrEmpty(email) && (loginInfo.Login?.LoginProvider?.Contains("OpenIdConnect") == true ||
+                                                   loginInfo.Login?.LoginProvider?.Equals("Microsoft", StringComparison.OrdinalIgnoreCase) == true))
                 {
-                    email = loginInfo.ExternalIdentity.FindFirstValue("GitHubUserName") ?? loginInfo.DefaultUserName;
+                    var objectId = loginInfo.ExternalIdentity?.FindFirstValue("http://schemas.microsoft.com/identity/claims/objectidentifier");
+                    var upn = loginInfo.ExternalIdentity?.FindFirstValue("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/upn");
+                    var name = loginInfo.ExternalIdentity?.FindFirstValue(ClaimTypes.Name);
+
+                    email = upn ??
+                            name ??
+                            loginInfo.DefaultUserName ??
+                            $"azureuser_{objectId ?? Guid.NewGuid().ToString()}";
+                    Debug.WriteLine($"ExternalLoginCallback: No email, using Microsoft fallback: {email}");
                 }
 
                 if (string.IsNullOrEmpty(email))
                 {
-                    Debug.WriteLine("ExternalLoginCallback: No email could be retrieved.");
-                    ViewBag.ErrorMessage = $"Unable to retrieve email from {loginInfo.Login?.LoginProvider}. Please ensure your account has a verified email address.";
+                    Debug.WriteLine("ExternalLoginCallback: No email or username could be retrieved.");
+                    TempData["ErrorMessage"] = $"Unable to retrieve email or username from {loginInfo.Login?.LoginProvider}. Please ensure your account has a verified email address.";
                     return View("ExternalLoginFailure");
                 }
 
-                Debug.WriteLine($"ExternalLoginCallback: Using email: {email}");
+                Debug.WriteLine($"ExternalLoginCallback: Using email/username: {email}");
 
-                // Try to sign in with existing external login
+                // Try to sign in
                 var result = await SignInManager.ExternalSignInAsync(loginInfo, isPersistent: false);
                 Debug.WriteLine($"ExternalLoginCallback: SignIn result: {result}");
 

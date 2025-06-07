@@ -3,8 +3,103 @@
     ViewBag.Title = "Register";
 }
 
-<h2>@ViewBag.Title.</h2>
+<style>
+    body {
+        background-color: #f5fff5;
+        color: #003300;
+        font-family: 'Segoe UI', sans-serif;
+        transition: all 0.4s ease;
+    }
 
+        body.dark-mode {
+            background-color: #0f0f0f;
+            color: #c0ffc0;
+        }
+
+    .btn-primary {
+        background-color: #2e8b57;
+        border-color: #2e8b57;
+        color: white;
+    }
+
+    body.dark-mode .btn-primary {
+        background-color: #006400;
+        border-color: #004d00;
+        color: white;
+    }
+
+    .btn-default {
+        background-color: #2e8b57;
+        border-color: #2e8b57;
+        color: white;
+    }
+
+    body.dark-mode .btn-default {
+        background-color: #006400;
+        border-color: #004d00;
+        color: white;
+    }
+
+    .form-control {
+        border: 1px solid #2e8b57;
+    }
+
+    body.dark-mode .form-control {
+        background-color: #1a1a1a;
+        color: #c0ffc0;
+        border: 1px solid #004d00;
+    }
+
+    hr {
+        border-top: 1px solid #2e8b57;
+    }
+
+    body.dark-mode hr {
+        border-top: 1px solid #006400;
+    }
+</style>
+
+<div class="text-right" style="margin: 10px;">
+    <button class="btn btn-outline-primary" id="themeToggle">
+        <i class="bi bi-sun-fill d-none" id="sunIcon"></i>
+        <i class="bi bi-moon-fill" id="moonIcon"></i>
+    </button>
+</div>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const body = document.body;
+        const themeToggle = document.getElementById("themeToggle");
+        const sunIcon = document.getElementById("sunIcon");
+        const moonIcon = document.getElementById("moonIcon");
+
+        function updateIcons() {
+            if (body.classList.contains("dark-mode")) {
+                sunIcon.classList.remove("d-none");
+                moonIcon.classList.add("d-none");
+            } else {
+                sunIcon.classList.add("d-none");
+                moonIcon.classList.remove("d-none");
+            }
+        }
+
+        if (localStorage.getItem("theme") === "dark") {
+            body.classList.add("dark-mode");
+        }
+
+        updateIcons();
+
+        themeToggle.addEventListener("click", function () {
+            body.classList.toggle("dark-mode");
+            localStorage.setItem("theme", body.classList.contains("dark-mode") ? "dark" : "light");
+            updateIcons();
+        });
+    });
+</script>
+
+<h2>@ViewBag.Title.</h2>
 @using (Html.BeginForm("Register", "Account", FormMethod.Post, new { @class = "form-horizontal", role = "form" }))
 {
     @Html.AntiForgeryToken()
@@ -35,7 +130,6 @@
         </div>
     </div>
 }
-
 @section Scripts {
     @Scripts.Render("~/bundles/jqueryval")
 }

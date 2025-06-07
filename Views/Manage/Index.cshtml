@@ -3,8 +3,144 @@
     ViewBag.Title = "Manage";
 }
 
-<h2>@ViewBag.Title.</h2>
+<style>
+    body {
+        background-color: #f5fff5;
+        color: #003300;
+        font-family: 'Segoe UI', sans-serif;
+        transition: all 0.4s ease;
+    }
 
+        body.dark-mode {
+            background-color: #0f0f0f;
+            color: #c0ffc0;
+        }
+
+    .btn-primary {
+        background-color: #2e8b57;
+        border-color: #2e8b57;
+        color: white;
+    }
+
+    body.dark-mode .btn-primary {
+        background-color: #006400;
+        border-color: #004d00;
+        color: white;
+    }
+
+    .btn-link {
+        color: #2e8b57;
+        text-decoration: none;
+    }
+
+    body.dark-mode .btn-link {
+        color: #c0ffc0;
+    }
+
+    .btn-link:hover {
+        color: #1e5e3e;
+        text-decoration: underline;
+    }
+
+    body.dark-mode .btn-link:hover {
+        color: #90ff90;
+    }
+
+    .form-control {
+        border: 1px solid #2e8b57;
+    }
+
+    body.dark-mode .form-control {
+        background-color: #1a1a1a;
+        color: #c0ffc0;
+        border: 1px solid #004d00;
+    }
+
+    hr {
+        border-top: 1px solid #2e8b57;
+    }
+
+    body.dark-mode hr {
+        border-top: 1px solid #006400;
+    }
+
+    .text-success {
+        color: #2e8b57 !important;
+    }
+
+    body.dark-mode .text-success {
+        color: #90ff90 !important;
+    }
+
+    a {
+        color: #2e8b57;
+        text-decoration: none;
+    }
+
+    body.dark-mode a {
+        color: #c0ffc0;
+    }
+
+    a:hover {
+        color: #1e5e3e;
+        text-decoration: underline;
+    }
+
+    body.dark-mode a:hover {
+        color: #90ff90;
+    }
+
+    .dl-horizontal dt {
+        color: #2e8b57;
+        font-weight: bold;
+    }
+
+    body.dark-mode .dl-horizontal dt {
+        color: #90ff90;
+    }
+</style>
+
+<div class="text-right" style="margin: 10px;">
+    <button class="btn btn-outline-primary" id="themeToggle">
+        <i class="bi bi-sun-fill d-none" id="sunIcon"></i>
+        <i class="bi bi-moon-fill" id="moonIcon"></i>
+    </button>
+</div>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const body = document.body;
+        const themeToggle = document.getElementById("themeToggle");
+        const sunIcon = document.getElementById("sunIcon");
+        const moonIcon = document.getElementById("moonIcon");
+
+        function updateIcons() {
+            if (body.classList.contains("dark-mode")) {
+                sunIcon.classList.remove("d-none");
+                moonIcon.classList.add("d-none");
+            } else {
+                sunIcon.classList.add("d-none");
+                moonIcon.classList.remove("d-none");
+            }
+        }
+
+        if (localStorage.getItem("theme") === "dark") {
+            body.classList.add("dark-mode");
+        }
+
+        updateIcons();
+
+        themeToggle.addEventListener("click", function () {
+            body.classList.toggle("dark-mode");
+            localStorage.setItem("theme", body.classList.contains("dark-mode") ? "dark" : "light");
+            updateIcons();
+        });
+    });
+</script>
+
+<h2>@ViewBag.Title.</h2>
 <p class="text-success">@ViewBag.StatusMessage</p>
 <div>
     <h4>Change your account settings</h4>
@@ -30,13 +166,13 @@
         </dd>
         @*
             Phone Numbers can used as a second factor of verification in a two-factor authentication system.
-             
+
              See <a href="https://go.microsoft.com/fwlink/?LinkId=403804">this article</a>
                 for details on setting up this ASP.NET application to support two-factor authentication using SMS.
-             
+
              Uncomment the following block after you have set up two-factor authentication
         *@
-        @*  
+        @*
             <dt>Phone Number:</dt>
             <dd>
                 @(Model.PhoneNumber ?? "None")
