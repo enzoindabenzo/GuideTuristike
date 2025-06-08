@@ -120,6 +120,7 @@ docker run -p 8080:80 guide-turistike
 <summary>🏠 <strong>Homepage & Navigation</strong></summary>
 
 ![Homepage Animation](docs/screenshots/EnzoTravel.png)
+
 *Dynamic homepage with smooth animations and intuitive navigation*
 
 </details>
@@ -130,6 +131,7 @@ docker run -p 8080:80 guide-turistike
 | Registration | Login |
 |-------------|--------|
 | ![Register](docs/screenshots/register.png) | ![Login](docs/screenshots/login.png) |
+
 *Secure user registration and login with modern UI design*
 
 </details>
@@ -138,6 +140,7 @@ docker run -p 8080:80 guide-turistike
 <summary>ℹ️ <strong>About & Information</strong></summary>
 
 ![About](docs/screenshots/about.png)
+
 *Comprehensive overview of our mission and services*
 
 </details>
@@ -146,6 +149,7 @@ docker run -p 8080:80 guide-turistike
 <summary>🧮 <strong>Interactive Trip Calculator</strong></summary>
 
 ![Calculator](docs/screenshots/calculator.png)
+
 *Real-time cost estimation with interactive map integration*
 
 </details>
@@ -154,6 +158,7 @@ docker run -p 8080:80 guide-turistike
 <summary>🏞️ <strong>Destination Browsing</strong></summary>
 
 ![Destinations](docs/screenshots/destinations.png)
+
 *Explore 35+ curated destinations with advanced filtering*
 
 </details>
@@ -164,6 +169,7 @@ docker run -p 8080:80 guide-turistike
 | Reservation Form | PDF Export |
 |------------------|------------|
 | ![Reservation](docs/screenshots/reservation.png) | ![PDF](docs/screenshots/pdf.png) |
+
 *Complete booking system with downloadable confirmations*
 
 </details>
@@ -183,6 +189,7 @@ docker run -p 8080:80 guide-turistike
 
 ### Reservation Management
 ![Admin Reservation](docs/screenshots/admin-reservation.png)
+
 *Comprehensive admin panel for managing all aspects of the platform*
 
 </details>
@@ -285,7 +292,7 @@ This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) 
 
 ---
 
-*Crafted with 💙 by **Enzo Indabenzó** and the open-source community*
+*Crafted with 💙 by **Enzoindabenzo** and the open-source community*
 
 **⭐ Don't forget to star this repository if you found it helpful!**
 
